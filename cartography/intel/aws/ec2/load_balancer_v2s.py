@@ -173,7 +173,7 @@ def load_load_balancer_v2_target_groups(
     """
     for target_group in target_groups:
 
-        if not target_group['TargetType'] == 'instance':
+        if target_group['TargetType'] != 'instance':
             # Only working on EC2 Instances now. TODO: Add IP & Lambda EXPOSE.
             continue
 

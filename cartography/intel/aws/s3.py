@@ -31,15 +31,24 @@ def get_s3_bucket_list(boto3_session: boto3.session.Session) -> List[Dict]:
         except ClientError as e:
             if "AccessDenied" in e.args[0]:
                 # If we don't have perms to call get_bucket_location(), set region to None and keep going
-                logger.warning("get_bucket_location(bucket='{}') AccessDenied, skipping.".format(bucket['Name']))
+                logger.warning(
+                    f"get_bucket_location(bucket='{bucket['Name']}') AccessDenied, skipping."
+                )
+
                 bucket['Region'] = None
                 continue
             elif "NoSuchBucket" in e.args[0]:
-                logger.warning("get_bucket_location({}) threw NoSuchBucket exception, skipping".format(bucket['Name']))
+                logger.warning(
+                    f"get_bucket_location({bucket['Name']}) threw NoSuchBucket exception, skipping"
+                )
+
                 bucket['Region'] = None
                 continue
             elif "AllAccessDisabled" in e.args[0]:
-                logger.warning("get_bucket_location({}) failed - bucket is disabled, skipping".format(bucket['Name']))
+                logger.warning(
+                    f"get_bucket_location({bucket['Name']}) failed - bucket is disabled, skipping"
+                )
+
             else:
                 raise
     return buckets
@@ -76,18 +85,30 @@ def get_policy(bucket: Dict, client: botocore.client.BaseClient) -> str:
     except ClientError as e:
         # no policy is defined for this bucket
         if "NoSuchBucketPolicy" in e.args[0]:
-            logger.warning("get_bucket_policy({}) failed because the bucket no longer exists".format(bucket['Name']))
+            logger.warning(
+                f"get_bucket_policy({bucket['Name']}) failed because the bucket no longer exists"
+            )
+
             policy = None
         elif "AccessDenied" in e.args[0]:
-            logger.warning("Access denied trying to retrieve S3 bucket {} policy".format(bucket['Name']))
+            logger.warning(
+                f"Access denied trying to retrieve S3 bucket {bucket['Name']} policy"
+            )
+
             policy = None
         elif "NoSuchBucket" in e.args[0]:
-            logger.warning("get_bucket_policy({}) threw NoSuchBucket exception, skipping".format(bucket['Name']))
+            logger.warning(
+                f"get_bucket_policy({bucket['Name']}) threw NoSuchBucket exception, skipping"
+            )
+
             policy = None
         elif "AllAccessDisabled" in e.args[0]:
             # Catches the following error : "An error occurred (AllAccessDisabled) when calling the
             # GetBucketAcl operation: All access to this object has been disabled"
-            logger.warning("Failed to retrieve S3 bucket {} policies - Bucket is disabled".format(bucket['Name']))
+            logger.warning(
+                f"Failed to retrieve S3 bucket {bucket['Name']} policies - Bucket is disabled"
+            )
+
             policy = None
         else:
             raise
@@ -103,16 +124,28 @@ def get_acl(bucket: Dict, client: botocore.client.BaseClient) -> Optional[str]:
         acl = client.get_bucket_acl(Bucket=bucket['Name'])
     except ClientError as e:
         if "AccessDenied" in e.args[0]:
-            logger.warning("Failed to retrieve S3 bucket {} ACL - Access Denied".format(bucket['Name']))
+            logger.warning(
+                f"Failed to retrieve S3 bucket {bucket['Name']} ACL - Access Denied"
+            )
+
             return None
         elif "NoSuchBucket" in e.args[0]:
-            logger.warning("Failed to retrieve S3 bucket {} ACL - No Such Bucket".format(bucket['Name']))
+            logger.warning(
+                f"Failed to retrieve S3 bucket {bucket['Name']} ACL - No Such Bucket"
+            )
+
             return None
         elif "AllAccessDisabled" in e.args[0]:
-            logger.warning("Failed to retrieve S3 bucket {} ACL - Bucket is disabled".format(bucket['Name']))
+            logger.warning(
+                f"Failed to retrieve S3 bucket {bucket['Name']} ACL - Bucket is disabled"
+            )
+
             return None
         elif "EndpointConnectionError" in e.args[0]:
-            logger.warning("Failed to retrieve S3 bucket {} ACL - EndpointConnectionError".format(bucket['Name']))
+            logger.warning(
+                f"Failed to retrieve S3 bucket {bucket['Name']} ACL - EndpointConnectionError"
+            )
+
             return None
         else:
             raise
@@ -197,8 +230,7 @@ def load_s3_details(
     for bucket, acl, policy in s3_details_iter:
         if acl is None:
             continue
-        parsed_acls = parse_acl(acl, bucket, aws_account_id)
-        if parsed_acls:
+        if parsed_acls := parse_acl(acl, bucket, aws_account_id):
             acls.extend(parsed_acls)
         else:
             continue
@@ -223,54 +255,19 @@ def parse_policy(bucket: str, policyDict: Dict) -> Optional[Dict]:
     """
     Uses PolicyUniverse to parse S3 policies and returns the internet accessibility results
     """
-    # policy is not required, so may be None
-    # policy JSON format. Note condition can be any JSON statement so will need to import as-is
-    # policy is a very complex format, so the policyuniverse library will be used for parsing out important data
-    # ...metadata...
-    # "Policy" :
-    # {
-    #     "Version": "2012-10-17",
-    #     {
-    #         "Statement": [
-    #             {
-    #                 "Effect": "Allow",
-    #                 "Principal": "*",
-    #                 "Action": "s3:GetObject",
-    #                 "Resource": "arn:aws:s3:::MyBucket/*"
-    #             },
-    #             {
-    #                 "Effect": "Deny",
-    #                 "Principal": "*",
-    #                 "Action": "s3:GetObject",
-    #                 "Resource": "arn:aws:s3:::MyBucket/MySecretFolder/*"
-    #             },
-    #             {
-    #                 "Effect": "Allow",
-    #                 "Principal": {
-    #                     "AWS": "arn:aws:iam::123456789012:root"
-    #                 },
-    #                 "Action": [
-    #                     "s3:DeleteObject",
-    #                     "s3:PutObject"
-    #                 ],
-    #                 "Resource": "arn:aws:s3:::MyBucket/*"
-    #             }
-    #         ]
-    #     }
-    # }
-    if policyDict is not None:
-        # get just the policy element and convert to JSON because boto3 returns this as string
-        policy = Policy(json.loads(policyDict['Policy']))
-        if policy.is_internet_accessible():
-            return {
-                "bucket": bucket,
-                "internet_accessible": True,
-                "accessible_actions": list(policy.internet_accessible_actions()),
-            }
-        else:
-            return None
-    else:
+    if policyDict is None:
         return None
+    # get just the policy element and convert to JSON because boto3 returns this as string
+    policy = Policy(json.loads(policyDict['Policy']))
+    return (
+        {
+            "bucket": bucket,
+            "internet_accessible": True,
+            "accessible_actions": list(policy.internet_accessible_actions()),
+        }
+        if policy.is_internet_accessible()
+        else None
+    )
 
 
 @timeit
@@ -327,16 +324,8 @@ def parse_acl(acl: Dict, bucket: str, aws_account_id: str) -> List[Dict]:
             continue
 
         # TODO this can be replaced with a string join
-        id_data = "{}:{}:{}:{}:{}:{}:{}:{}".format(
-            aws_account_id,
-            parsed_acl['owner'],
-            parsed_acl['ownerid'],
-            parsed_acl['type'],
-            parsed_acl['displayname'],
-            parsed_acl['granteeid'],
-            parsed_acl['uri'],
-            parsed_acl['permission'],
-        )
+        id_data = f"{aws_account_id}:{parsed_acl['owner']}:{parsed_acl['ownerid']}:{parsed_acl['type']}:{parsed_acl['displayname']}:{parsed_acl['granteeid']}:{parsed_acl['uri']}:{parsed_acl['permission']}"
+
 
         parsed_acl['id'] = hashlib.sha256(id_data.encode("utf8")).hexdigest()
         acl_list.append(parsed_acl)

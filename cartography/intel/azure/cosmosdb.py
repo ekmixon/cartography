@@ -24,8 +24,7 @@ def get_client(credentials: Credentials, subscription_id: str) -> CosmosDBManage
     """
     Getting the CosmosDB client
     """
-    client = CosmosDBManagementClient(credentials, subscription_id)
-    return client
+    return CosmosDBManagementClient(credentials, subscription_id)
 
 
 @timeit

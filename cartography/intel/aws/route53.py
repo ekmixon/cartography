@@ -244,22 +244,21 @@ def transform_record_set(record_set: Dict, zone_id: str, name: str) -> Optional[
                 "value": record_set['AliasTarget']['DNSName'][:-1],
                 "id": _create_dns_record_id(zone_id, name, 'ALIAS'),
             }
-        else:
-            # this is a real A record
-            # loop and add each value (IP address) to a comma separated string
-            # don't forget to trim that trailing comma!
-            # TODO can this be replaced with a string join?
-            value = ''
-            for a_value in record_set['ResourceRecords']:
-                value = value + a_value['Value'] + ','
+        # this is a real A record
+        # loop and add each value (IP address) to a comma separated string
+        # don't forget to trim that trailing comma!
+        # TODO can this be replaced with a string join?
+        value = ''
+        for a_value in record_set['ResourceRecords']:
+            value = value + a_value['Value'] + ','
 
-            return {
-                "name": name,
-                "type": 'A',
-                "zoneid": zone_id,
-                "value": value[:-1],
-                "id": _create_dns_record_id(zone_id, name, 'A'),
-            }
+        return {
+            "name": name,
+            "type": 'A',
+            "zoneid": zone_id,
+            "value": value[:-1],
+            "id": _create_dns_record_id(zone_id, name, 'A'),
+        }
 
     else:
         return None
@@ -286,11 +285,7 @@ def transform_ns_record_set(record_set: Dict, zone_id: str) -> Optional[Dict]:
 @timeit
 def transform_zone(zone: Dict) -> Dict:
     # TODO simplify this
-    if 'Comment' in zone['Config']:
-        comment = zone['Config']['Comment']
-    else:
-        comment = ''
-
+    comment = zone['Config']['Comment'] if 'Comment' in zone['Config'] else ''
     return {
         "zoneid": zone['Id'],
         "name": zone['Name'],
@@ -315,7 +310,7 @@ def load_dns_details(
         load_zone(neo4j_session, parsed_zone, current_aws_id, update_tag)
 
         for record_set in zone_record_sets:
-            if record_set['Type'] == 'A' or record_set['Type'] == 'CNAME':
+            if record_set['Type'] in ['A', 'CNAME']:
                 record = transform_record_set(record_set, zone['Id'], record_set['Name'][:-1])
 
                 if record['type'] == 'A':

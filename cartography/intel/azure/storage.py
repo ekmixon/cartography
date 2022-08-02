@@ -23,8 +23,7 @@ def get_client(credentials: Credentials, subscription_id: str) -> StorageManagem
     """
     Getting the Azure Storage client
     """
-    client = StorageManagementClient(credentials, subscription_id)
-    return client
+    return StorageManagementClient(credentials, subscription_id)
 
 
 @timeit

@@ -44,12 +44,12 @@ def _get_cidr_association_statement(block_type: str) -> str:
     # base label type. We add the AWS ipv4 or 6 depending on block type
     BLOCK_TYPE = "AWSCidrBlock"
 
-    if block_type == "ipv6":
-        BLOCK_CIDR = "Ipv6" + BLOCK_CIDR
-        STATE_NAME = "Ipv6" + STATE_NAME
-        BLOCK_TYPE = BLOCK_TYPE + ":AWSIpv6CidrBlock"
-    elif block_type == "ipv4":
-        BLOCK_TYPE = BLOCK_TYPE + ":AWSIpv4CidrBlock"
+    if block_type == "ipv4":
+        BLOCK_TYPE += ":AWSIpv4CidrBlock"
+    elif block_type == "ipv6":
+        BLOCK_CIDR = f"Ipv6{BLOCK_CIDR}"
+        STATE_NAME = f"Ipv6{STATE_NAME}"
+        BLOCK_TYPE += ":AWSIpv6CidrBlock"
     else:
         raise ValueError(f"Unsupported block type specified - {block_type}")
 

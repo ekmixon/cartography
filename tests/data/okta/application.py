@@ -148,7 +148,7 @@ APPLICATION_WITH_REDITECT_URIS = """
 
 
 def create_test_application():
-    app = {
+    return {
         "id": "app_id_value",
         "name": "app_name_value",
         "label": "app_label_value",
@@ -159,4 +159,3 @@ def create_test_application():
         "features": "app_features_value",
         "signOnMode": "app_signonmode_value",
     }
-    return app

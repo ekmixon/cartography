@@ -59,10 +59,11 @@ def transform_user_roles_data(data: str, okta_org_id: str) -> List[Dict]:
     user_roles = []
 
     for role in role_data:
-        role_props = {}
-        role_props["label"] = role["label"]
-        role_props["type"] = role["type"]
-        role_props["id"] = "{}-{}".format(okta_org_id, role["type"])
+        role_props = {
+            "label": role["label"],
+            "type": role["type"],
+            "id": f'{okta_org_id}-{role["type"]}',
+        }
 
         user_roles.append(role_props)
 
@@ -82,10 +83,11 @@ def transform_group_roles_data(data: str, okta_org_id: str) -> List[Dict]:
     user_roles = []
 
     for role in role_data:
-        role_props = {}
-        role_props["label"] = role["label"]
-        role_props["type"] = role["type"]
-        role_props["id"] = "{}-{}".format(okta_org_id, role["type"])
+        role_props = {
+            "label": role["label"],
+            "type": role["type"],
+            "id": f'{okta_org_id}-{role["type"]}',
+        }
 
         user_roles.append(role_props)
 

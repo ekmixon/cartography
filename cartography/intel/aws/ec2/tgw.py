@@ -115,7 +115,8 @@ def load_transit_gateways(
 def _attach_shared_transit_gateway(
     neo4j_session: neo4j.Session, tgw: Dict, region: str, current_aws_account_id: str, update_tag: int,
 ) -> None:
-    attach_tgw = """
+    if tgw["OwnerId"] != current_aws_account_id:
+        attach_tgw = """
     MERGE (tgw:AWSTransitGateway {id: {ARN}})
     ON CREATE SET tgw.firstseen = timestamp()
     SET tgw.lastupdated = {update_tag}
@@ -127,7 +128,6 @@ def _attach_shared_transit_gateway(
     SET s.lastupdated = {update_tag}
     """
 
-    if tgw["OwnerId"] != current_aws_account_id:
         neo4j_session.run(
             attach_tgw,
             ARN=tgw["TransitGatewayArn"],

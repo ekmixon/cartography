@@ -172,8 +172,7 @@ def get_risk_data(data_dict: Dict, key: str) -> int:
     :return:
     """
     data = data_dict.get(key)
-    data_score = data.get('total', 0) if data else 0
-    return data_score
+    return data.get('total', 0) if data else 0
 
 
 @timeit
@@ -256,11 +255,11 @@ def transform_user_extensions(user_extension_json: Dict) -> Tuple[List[Any], Lis
                     'id': f"{extension_id}|{version}",
                     'user': user,
                 })
-    if len(users_set) == 0:
+    if not users_set:
         raise ValueError('No users returned from CRXcavator')
-    if len(extensions) == 0:
+    if not extensions:
         raise ValueError('No extensions information returned from CRXcavator')
-    if len(extensions_by_user) == 0:
+    if not extensions_by_user:
         raise ValueError('No user->extension mapping returned from CRXcavator')
 
     return list(users_set), extensions, extensions_by_user
@@ -320,7 +319,10 @@ def sync_extensions(
     try:
         user_extensions_json = get_users_extensions(crxcavator_api_key, crxcavator_base_url)
     except requests.exceptions.Timeout:
-        logger.warning(f"get_users_extensions() failed due to timeout. Skipping CRXcavator sync.")
+        logger.warning(
+            "get_users_extensions() failed due to timeout. Skipping CRXcavator sync."
+        )
+
         return
     users, extensions_list, user_extensions = transform_user_extensions(user_extensions_json)
     extension_details = get_extensions(crxcavator_api_key, crxcavator_base_url, extensions_list)

@@ -157,7 +157,7 @@ def test_standardize_aws_sync_kwargs():
         all_args: List[str] = inspect.getfullargspec(sync_func).args
 
         # Inspect the sync func if it is wrapped, e.g. by @timeit
-        if len(all_args) == 0:
+        if not all_args:
             all_args = inspect.getfullargspec(sync_func.__wrapped__).args
 
         for arg_name in all_args:

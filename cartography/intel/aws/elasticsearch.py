@@ -155,7 +155,14 @@ def _link_es_domain_vpc(neo4j_session: neo4j.Session, domain_id: str, domain_dat
     :param domain_id: ES domain id
     :param domain_data: domain data
     """
-    ingest_subnet = """
+    # TODO we really shouldn't be sending full objects to Neo4j
+    if domain_data.get("VPCOptions"):
+        vpc_data = domain_data["VPCOptions"]
+        subnetList = vpc_data.get("SubnetIds", [])
+        groupList = vpc_data.get("SecurityGroupIds", [])
+
+        if len(subnetList) > 0:
+            ingest_subnet = """
     MATCH (es:ESDomain{id: {DomainId}})
     WITH es
     UNWIND {SubnetList} as subnet_id
@@ -165,22 +172,6 @@ def _link_es_domain_vpc(neo4j_session: neo4j.Session, domain_id: str, domain_dat
         SET r.lastupdated = {aws_update_tag}
     """
 
-    ingest_sec_groups = """
-    MATCH (es:ESDomain{id: {DomainId}})
-    WITH es
-    UNWIND {SecGroupList} as ecsecgroup_id
-        MATCH (group_node:EC2SecurityGroup{id: ecsecgroup_id})
-        MERGE (es)-[r:MEMBER_OF_EC2_SECURITY_GROUP]->(group_node)
-        ON CREATE SET r.firstseen = timestamp()
-        SET r.lastupdated = {aws_update_tag}
-    """
-    # TODO we really shouldn't be sending full objects to Neo4j
-    if domain_data.get("VPCOptions"):
-        vpc_data = domain_data["VPCOptions"]
-        subnetList = vpc_data.get("SubnetIds", [])
-        groupList = vpc_data.get("SecurityGroupIds", [])
-
-        if len(subnetList) > 0:
             neo4j_session.run(
                 ingest_subnet,
                 DomainId=domain_id,
@@ -189,6 +180,15 @@ def _link_es_domain_vpc(neo4j_session: neo4j.Session, domain_id: str, domain_dat
             )
 
         if len(groupList) > 0:
+            ingest_sec_groups = """
+    MATCH (es:ESDomain{id: {DomainId}})
+    WITH es
+    UNWIND {SecGroupList} as ecsecgroup_id
+        MATCH (group_node:EC2SecurityGroup{id: ecsecgroup_id})
+        MERGE (es)-[r:MEMBER_OF_EC2_SECURITY_GROUP]->(group_node)
+        ON CREATE SET r.firstseen = timestamp()
+        SET r.lastupdated = {aws_update_tag}
+    """
             neo4j_session.run(
                 ingest_sec_groups,
                 DomainId=domain_id,

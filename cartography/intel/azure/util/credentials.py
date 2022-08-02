@@ -40,7 +40,7 @@ class Credentials:
         else:
             # This is a last resort, e.g. for MSI authentication
             try:
-                h = {'Authorization': 'Bearer {}'.format(self.arm_credentials.token['access_token'])}
+                h = {'Authorization': f"Bearer {self.arm_credentials.token['access_token']}"}
                 r = requests.get('https://management.azure.com/tenants?api-version=2020-01-01', headers=h)
                 r2 = r.json()
                 return r2.get('value')[0].get('tenantId')
@@ -75,7 +75,7 @@ class Credentials:
         Refresh credentials
         """
         logger.debug('Refreshing credentials')
-        authority_uri = AUTHORITY_HOST_URI + '/' + self.get_tenant_id()
+        authority_uri = f'{AUTHORITY_HOST_URI}/{self.get_tenant_id()}'
         if self.context:
             existing_cache = self.context.cache
             context = adal.AuthenticationContext(authority_uri, cache=existing_cache)
@@ -87,8 +87,7 @@ class Credentials:
             credentials.token['resource'], credentials.token['user_id'], credentials.token['_client_id'],
         )
 
-        new_credentials = AADTokenCredentials(new_token, credentials.token.get('_client_id'))
-        return new_credentials
+        return AADTokenCredentials(new_token, credentials.token.get('_client_id'))
 
 
 class Authenticator:

@@ -34,7 +34,10 @@ def get_kms_key_list(boto3_session: boto3.session.Session, region: str) -> List[
         try:
             response = client.describe_key(KeyId=key["KeyId"])['KeyMetadata']
         except ClientError as e:
-            logger.warning("Failed to describe key with key id - {}. Error - {}".format(key["KeyId"], e))
+            logger.warning(
+                f'Failed to describe key with key id - {key["KeyId"]}. Error - {e}'
+            )
+
             raise
 
         described_key_list.append(response)
@@ -67,7 +70,10 @@ def get_policy(key: Dict, client: botocore.client.BaseClient) -> Any:
         policy = client.get_key_policy(KeyId=key["KeyId"], PolicyName='default')
     except ClientError as e:
         policy = None
-        logger.warning("Failed to retrieve Key Policy for key id - {}. Error - {}".format(key["KeyId"], e))
+        logger.warning(
+            f'Failed to retrieve Key Policy for key id - {key["KeyId"]}. Error - {e}'
+        )
+
         raise
 
     return policy
@@ -203,7 +209,7 @@ def load_kms_key_details(
             policies.append(parsed_policy)
         if len(alias) > 0:
             aliases.extend(alias)
-        if len(grants) > 0:
+        if grants:
             grants.extend(grant)
 
     # cleanup existing policy properties
@@ -224,61 +230,19 @@ def parse_policy(key: str, policy: Policy) -> Optional[Dict[Any, Any]]:
     """
     Uses PolicyUniverse to parse KMS key policies and returns the internet accessibility results
     """
-    # policy is not required, so may be None
-    # policy JSON format. Note condition can be any JSON statement so will need to import as-is
-    # policy is a very complex format, so the policyuniverse library will be used for parsing out important data
-    # ...metadata...
-    # "Policy" :
-    # {
-    #   "Version": "2012-10-17",
-    #   "Id": "key-consolepolicy-5",
-    #   "Statement": [
-    #     {
-    #       "Sid": "Enable IAM User Permissions",
-    #       "Effect": "Allow",
-    #       "Principal": {
-    #         "AWS": "arn:aws:iam::123456789012:root"
-    #       },
-    #       "Action": "kms:*",
-    #       "Resource": "*"
-    #     },
-    #     {
-    #       "Sid": "Allow access for Key Administrators",
-    #       "Effect": "Allow",
-    #       "Principal": {
-    #         "AWS": "arn:aws:iam::123456789012:role/ec2-manager"
-    #       },
-    #       "Action": [
-    #         "kms:Create*",
-    #         "kms:Describe*",
-    #         "kms:Enable*",
-    #         "kms:List*",
-    #         "kms:Put*",
-    #         "kms:Update*",
-    #         "kms:Revoke*",
-    #         "kms:Disable*",
-    #         "kms:Get*",
-    #         "kms:Delete*",
-    #         "kms:ScheduleKeyDeletion",
-    #         "kms:CancelKeyDeletion"
-    #       ],
-    #       "Resource": "*"
-    #     }
-    #   ]
-    # }
-    if policy is not None:
-        # get just the policy element and convert to JSON because boto3 returns this as string
-        policy = Policy(json.loads(policy['Policy']))
-        if policy.is_internet_accessible():
-            return {
-                "kms_key": key,
-                "internet_accessible": True,
-                "accessible_actions": list(policy.internet_accessible_actions()),
-            }
-        else:
-            return None
-    else:
+    if policy is None:
         return None
+    # get just the policy element and convert to JSON because boto3 returns this as string
+    policy = Policy(json.loads(policy['Policy']))
+    return (
+        {
+            "kms_key": key,
+            "internet_accessible": True,
+            "accessible_actions": list(policy.internet_accessible_actions()),
+        }
+        if policy.is_internet_accessible()
+        else None
+    )
 
 
 @timeit

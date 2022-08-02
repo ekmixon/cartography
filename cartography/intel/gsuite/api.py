@@ -45,8 +45,7 @@ def transform_groups(response_objects: List[Dict]) -> List[Dict]:
     """
     groups: List[Dict] = []
     for response_object in response_objects:
-        for group in response_object['groups']:
-            groups.append(group)
+        groups.extend(iter(response_object['groups']))
     return groups
 
 
@@ -58,8 +57,7 @@ def transform_users(response_objects: List[Dict]) -> List[Dict]:
     """
     users: List[Dict] = []
     for response_object in response_objects:
-        for user in response_object['users']:
-            users.append(user)
+        users.extend(iter(response_object['users']))
     return users
 
 
@@ -142,7 +140,7 @@ def load_gsuite_groups(neo4j_session: neo4j.Session, groups: List[Dict], gsuite_
         g.name = group.name,
         g.lastupdated = {UpdateTag}
     """
-    logger.info('Ingesting {} gsuite groups'.format(len(groups)))
+    logger.info(f'Ingesting {len(groups)} gsuite groups')
     neo4j_session.run(ingestion_qry, GroupData=groups, UpdateTag=gsuite_update_tag)
 
 
@@ -181,7 +179,7 @@ def load_gsuite_users(neo4j_session: neo4j.Session, users: List[Dict], gsuite_up
         u.thumbnail_photo_url = user.thumbnailPhotoUrl,
         u.lastupdated = {UpdateTag}
     """
-    logger.info('Ingesting {} gsuite users'.format(len(users)))
+    logger.info(f'Ingesting {len(users)} gsuite users')
     neo4j_session.run(ingestion_qry, UserData=users, UpdateTag=gsuite_update_tag)
 
 

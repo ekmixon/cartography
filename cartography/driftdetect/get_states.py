@@ -76,10 +76,8 @@ def run_get_states(config):
                 get_query_state(session, query_directory, state_serializer, FileSystem, filename)
                 add_shortcut(FileSystem, shortcut_serializer, query_directory, 'most-recent', filename)
             except ValidationError as err:
-                msg = "Unable to create State for directory {}, with data \n{}".format(
-                    query_directory,
-                    err.messages,
-                )
+                msg = f"Unable to create State for directory {query_directory}, with data \n{err.messages}"
+
                 logger.exception(msg)
             except KeyError as err:
                 msg = f"Could not find {err} field in state template for directory {query_directory}."

@@ -9,11 +9,7 @@ def test_transform_and_load_droplets(neo4j_session):
     test_droplet = droplet_res[0]
     account_id = 1
     project_id = 'project_1'
-    project_resources = {
-        str(project_id): [
-            'do:droplet:' + test_droplet.id,
-        ],
-    }
+    project_resources = {project_id: [f'do:droplet:{test_droplet.id}']}
 
     """
     Test that we can correctly transform and load DODroplet nodes to Neo4j.

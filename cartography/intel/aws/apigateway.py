@@ -69,16 +69,15 @@ def get_rest_api_client_certificate(stages: Dict, client: botocore.client.BaseCl
     """
     response = None
     for stage in stages:
-        if 'clientCertificateId' in stage:
-            try:
-                response = client.get_client_certificate(clientCertificateId=stage['clientCertificateId'])
-                response['stageName'] = stage['stageName']
-            except ClientError as e:
-                logger.warning(f"Failed to retrive Client Certificate for Stage {stage['stageName']} - {e}")
-                raise
-        else:
+        if 'clientCertificateId' not in stage:
             return []
 
+        try:
+            response = client.get_client_certificate(clientCertificateId=stage['clientCertificateId'])
+            response['stageName'] = stage['stageName']
+        except ClientError as e:
+            logger.warning(f"Failed to retrive Client Certificate for Stage {stage['stageName']} - {e}")
+            raise
     return response
 
 
@@ -101,8 +100,7 @@ def get_rest_api_policy(api: Dict, client: botocore.client.BaseClient) -> List[A
     """
     Gets the REST API policy. Returns policy string or None if no policy is present.
     """
-    policy = api['policy'] if 'policy' in api and api['policy'] else None
-    return policy
+    return api['policy'] if 'policy' in api and api['policy'] else None
 
 
 @timeit
@@ -329,23 +327,22 @@ def parse_policy(api_id: str, policy: Policy) -> Optional[Dict[Any, Any]]:
     Uses PolicyUniverse to parse API Gateway REST API policy and returns the internet accessibility results
     """
 
-    if policy is not None:
-        # unescape doubly escapped JSON
-        policy = policy.replace("\\", "")
-        try:
-            policy = Policy(json.loads(policy))
-            if policy.is_internet_accessible():
-                return {
-                    "api_id": api_id,
-                    "internet_accessible": True,
-                    "accessible_actions": list(policy.internet_accessible_actions()),
-                }
-            else:
-                return None
-        except json.JSONDecodeError:
-            logger.warn(f"failed to decode policy json : {policy}")
+    if policy is None:
+        return None
+    # unescape doubly escapped JSON
+    policy = policy.replace("\\", "")
+    try:
+        policy = Policy(json.loads(policy))
+        if policy.is_internet_accessible():
+            return {
+                "api_id": api_id,
+                "internet_accessible": True,
+                "accessible_actions": list(policy.internet_accessible_actions()),
+            }
+        else:
             return None
-    else:
+    except json.JSONDecodeError:
+        logger.warn(f"failed to decode policy json : {policy}")
         return None
 
 

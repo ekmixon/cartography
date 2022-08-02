@@ -37,16 +37,14 @@ def transform_trusted_origins(data: str) -> List[Dict]:
 
     json_data = json.loads(data)
     for origin_data in json_data:
-        props = {}
-        props["id"] = origin_data["id"]
-        props["name"] = origin_data["name"]
-        props["origin"] = origin_data["origin"]
+        props = {
+            "id": origin_data["id"],
+            "name": origin_data["name"],
+            "origin": origin_data["origin"],
+        }
 
         # https://developer.okta.com/docs/reference/api/trusted-origins/#scope-object
-        scope_types = []
-        for scope in origin_data.get("scopes", []):
-            scope_types.append(scope["type"])
-
+        scope_types = [scope["type"] for scope in origin_data.get("scopes", [])]
         props["scopes"] = scope_types
         props["status"] = origin_data["status"]
         props["created"] = origin_data.get("created", None)

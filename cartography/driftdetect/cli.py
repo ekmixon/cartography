@@ -212,8 +212,8 @@ def configure_get_state_neo4j(config):
     :rtype: Config Object
     :return: The config object.
     """
+    config.neo4j_password = None
     if config.neo4j_user:
-        config.neo4j_password = None
         if config.neo4j_password_prompt:
             logger.info("Reading password for Neo4j user '%s' interactively.", config.neo4j_user)
             config.neo4j_password = getpass.getpass()
@@ -226,8 +226,6 @@ def configure_get_state_neo4j(config):
             config.neo4j_password = os.environ.get(config.neo4j_password_env_var)
         if not config.neo4j_password:
             logger.warning("Neo4j username was provided but a password could not be found.")
-    else:
-        config.neo4j_password = None
     return config
 
 

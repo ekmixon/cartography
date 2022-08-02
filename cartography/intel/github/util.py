@@ -53,8 +53,7 @@ def fetch_page(token: str, api_url: str, organization: str, query: str, cursor: 
         'cursor': cursor,
     }
     gql_vars_json = json.dumps(gql_vars)
-    response = call_github_api(query, gql_vars_json, token, api_url)
-    return response
+    return call_github_api(query, gql_vars_json, token, api_url)
 
 
 def fetch_all(

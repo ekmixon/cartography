@@ -87,10 +87,7 @@ def test_load_queue_services(neo4j_session):
         TEST_UPDATE_TAG,
     )
 
-    expected_nodes = {
-        sa1 + "/queueServices/QS1",
-        sa2 + "/queueServices/QS2",
-    }
+    expected_nodes = {f"{sa1}/queueServices/QS1", f"{sa2}/queueServices/QS2"}
 
     nodes = neo4j_session.run(
         """
@@ -119,13 +116,10 @@ def test_load_queue_services_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            sa1, sa1 + "/queueServices/QS1",
-        ),
-        (
-            sa2, sa2 + "/queueServices/QS2",
-        ),
+        (sa1, f"{sa1}/queueServices/QS1"),
+        (sa2, f"{sa2}/queueServices/QS2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -148,10 +142,7 @@ def test_load_table_services(neo4j_session):
         TEST_UPDATE_TAG,
     )
 
-    expected_nodes = {
-        sa1 + "/tableServices/TS1",
-        sa2 + "/tableServices/TS2",
-    }
+    expected_nodes = {f"{sa1}/tableServices/TS1", f"{sa2}/tableServices/TS2"}
 
     nodes = neo4j_session.run(
         """
@@ -180,13 +171,10 @@ def test_load_table_services_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            sa1, sa1 + "/tableServices/TS1",
-        ),
-        (
-            sa2, sa2 + "/tableServices/TS2",
-        ),
+        (sa1, f"{sa1}/tableServices/TS1"),
+        (sa2, f"{sa2}/tableServices/TS2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -209,10 +197,7 @@ def test_load_file_services(neo4j_session):
         TEST_UPDATE_TAG,
     )
 
-    expected_nodes = {
-        sa1 + "/fileServices/FS1",
-        sa2 + "/fileServices/FS2",
-    }
+    expected_nodes = {f"{sa1}/fileServices/FS1", f"{sa2}/fileServices/FS2"}
 
     nodes = neo4j_session.run(
         """
@@ -240,14 +225,7 @@ def test_load_file_services_relationships(neo4j_session):
         TEST_UPDATE_TAG,
     )
 
-    expected = {
-        (
-            sa1, sa1 + "/fileServices/FS1",
-        ),
-        (
-            sa2, sa2 + "/fileServices/FS2",
-        ),
-    }
+    expected = {(sa1, f"{sa1}/fileServices/FS1"), (sa2, f"{sa2}/fileServices/FS2")}
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -270,10 +248,7 @@ def test_load_blob_services(neo4j_session):
         TEST_UPDATE_TAG,
     )
 
-    expected_nodes = {
-        sa1 + "/blobServices/BS1",
-        sa2 + "/blobServices/BS2",
-    }
+    expected_nodes = {f"{sa1}/blobServices/BS1", f"{sa2}/blobServices/BS2"}
 
     nodes = neo4j_session.run(
         """
@@ -301,14 +276,7 @@ def test_load_blob_services_relationships(neo4j_session):
         TEST_UPDATE_TAG,
     )
 
-    expected = {
-        (
-            sa1, sa1 + "/blobServices/BS1",
-        ),
-        (
-            sa2, sa2 + "/blobServices/BS2",
-        ),
-    }
+    expected = {(sa1, f"{sa1}/blobServices/BS1"), (sa2, f"{sa2}/blobServices/BS2")}
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -332,9 +300,10 @@ def test_load_queues(neo4j_session):
     )
 
     expected_nodes = {
-        sa1 + "/queueServices/QS1/queues/queue1",
-        sa2 + "/queueServices/QS2/queues/queue2",
+        f"{sa1}/queueServices/QS1/queues/queue1",
+        f"{sa2}/queueServices/QS2/queues/queue2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -362,15 +331,10 @@ def test_load_queues_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            sa1 + "/queueServices/QS1",
-            sa1 + "/queueServices/QS1/queues/queue1",
-        ),
-        (
-            sa2 + "/queueServices/QS2",
-            sa2 + "/queueServices/QS2/queues/queue2",
-        ),
+        (f"{sa1}/queueServices/QS1", f"{sa1}/queueServices/QS1/queues/queue1"),
+        (f"{sa2}/queueServices/QS2", f"{sa2}/queueServices/QS2/queues/queue2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -394,9 +358,10 @@ def test_load_tables(neo4j_session):
     )
 
     expected_nodes = {
-        sa1 + "/tableServices/TS1/tables/table1",
-        sa2 + "/tableServices/TS2/tables/table2",
+        f"{sa1}/tableServices/TS1/tables/table1",
+        f"{sa2}/tableServices/TS2/tables/table2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -424,15 +389,10 @@ def test_load_tables_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            sa1 + "/tableServices/TS1",
-            sa1 + "/tableServices/TS1/tables/table1",
-        ),
-        (
-            sa2 + "/tableServices/TS2",
-            sa2 + "/tableServices/TS2/tables/table2",
-        ),
+        (f"{sa1}/tableServices/TS1", f"{sa1}/tableServices/TS1/tables/table1"),
+        (f"{sa2}/tableServices/TS2", f"{sa2}/tableServices/TS2/tables/table2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -456,9 +416,10 @@ def test_load_shares(neo4j_session):
     )
 
     expected_nodes = {
-        sa1 + "/fileServices/FS1/shares/share1",
-        sa2 + "/fileServices/FS2/shares/share2",
+        f"{sa1}/fileServices/FS1/shares/share1",
+        f"{sa2}/fileServices/FS2/shares/share2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -486,15 +447,10 @@ def test_load_shares_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            sa1 + "/fileServices/FS1",
-            sa1 + "/fileServices/FS1/shares/share1",
-        ),
-        (
-            sa2 + "/fileServices/FS2",
-            sa2 + "/fileServices/FS2/shares/share2",
-        ),
+        (f"{sa1}/fileServices/FS1", f"{sa1}/fileServices/FS1/shares/share1"),
+        (f"{sa2}/fileServices/FS2", f"{sa2}/fileServices/FS2/shares/share2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -518,9 +474,10 @@ def test_load_blob_containers(neo4j_session):
     )
 
     expected_nodes = {
-        sa1 + "/blobServices/BS1/containers/container1",
-        sa2 + "/blobServices/BS2/containers/container2",
+        f"{sa1}/blobServices/BS1/containers/container1",
+        f"{sa2}/blobServices/BS2/containers/container2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -549,14 +506,15 @@ def test_load_blob_containers_relationships(neo4j_session):
 
     expected = {
         (
-            sa1 + "/blobServices/BS1",
-            sa1 + "/blobServices/BS1/containers/container1",
+            f"{sa1}/blobServices/BS1",
+            f"{sa1}/blobServices/BS1/containers/container1",
         ),
         (
-            sa2 + "/blobServices/BS2",
-            sa2 + "/blobServices/BS2/containers/container2",
+            f"{sa2}/blobServices/BS2",
+            f"{sa2}/blobServices/BS2/containers/container2",
         ),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(

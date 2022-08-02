@@ -14,8 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_client(credentials: Credentials, subscription_id: str) -> ComputeManagementClient:
-    client = ComputeManagementClient(credentials, subscription_id)
-    return client
+    return ComputeManagementClient(credentials, subscription_id)
 
 
 def get_vm_list(credentials: Credentials, subscription_id: str) -> List[Dict]:

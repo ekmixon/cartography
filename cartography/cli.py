@@ -330,9 +330,9 @@ class CLI:
         else:
             logging.getLogger('cartography').setLevel(logging.INFO)
         logger.debug("Launching cartography with CLI configuration: %r", vars(config))
+        config.neo4j_password = None
         # Neo4j config
         if config.neo4j_user:
-            config.neo4j_password = None
             if config.neo4j_password_prompt:
                 logger.info("Reading password for Neo4j user '%s' interactively.", config.neo4j_user)
                 config.neo4j_password = getpass.getpass()
@@ -345,9 +345,6 @@ class CLI:
                 config.neo4j_password = os.environ.get(config.neo4j_password_env_var)
             if not config.neo4j_password:
                 logger.warning("Neo4j username was provided but a password could not be found.")
-        else:
-            config.neo4j_password = None
-
         # AWS config
         if config.aws_requested_syncs:
             # No need to store the returned value; we're using this for input validation.

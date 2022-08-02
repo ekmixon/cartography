@@ -411,9 +411,10 @@ def test_load_cosmosdb_private_endpoint_connections(neo4j_session):
         )
 
     expected_nodes = {
-        da1 + "/privateEndpointConnections/pe1",
-        da2 + "/privateEndpointConnections/pe2",
+        f"{da1}/privateEndpointConnections/pe1",
+        f"{da2}/privateEndpointConnections/pe2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -443,13 +444,10 @@ def test_load_cosmosdb_private_endpoint_connections_relationships(neo4j_session)
         )
 
     expected = {
-        (
-            da1, da1 + "/privateEndpointConnections/pe1",
-        ),
-        (
-            da2, da2 + "/privateEndpointConnections/pe2",
-        ),
+        (da1, f"{da1}/privateEndpointConnections/pe1"),
+        (da2, f"{da2}/privateEndpointConnections/pe2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -474,9 +472,10 @@ def test_load_cosmosdb_virtual_network_rules(neo4j_session):
         )
 
     expected_nodes = {
-        rg + "/providers/Microsoft.Network/virtualNetworks/vn1",
-        rg + "/providers/Microsoft.Network/virtualNetworks/vn2",
+        f"{rg}/providers/Microsoft.Network/virtualNetworks/vn1",
+        f"{rg}/providers/Microsoft.Network/virtualNetworks/vn2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -506,13 +505,10 @@ def test_load_cosmosdb_virtual_network_rules_relationships(neo4j_session):
         )
 
     expected = {
-        (
-            da1, rg + "/providers/Microsoft.Network/virtualNetworks/vn1",
-        ),
-        (
-            da2, rg + "/providers/Microsoft.Network/virtualNetworks/vn2",
-        ),
+        (da1, f"{rg}/providers/Microsoft.Network/virtualNetworks/vn1"),
+        (da2, f"{rg}/providers/Microsoft.Network/virtualNetworks/vn2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -535,10 +531,7 @@ def test_load_sql_databases(neo4j_session):
         TEST_UPDATE_TAG,
     )
 
-    expected_nodes = {
-        da1 + "/sqlDatabases/sql_db1",
-        da2 + "/sqlDatabases/sql_db2",
-    }
+    expected_nodes = {f"{da1}/sqlDatabases/sql_db1", f"{da2}/sqlDatabases/sql_db2"}
 
     nodes = neo4j_session.run(
         """
@@ -566,13 +559,10 @@ def test_load_sql_databases_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            da1, da1 + "/sqlDatabases/sql_db1",
-        ),
-        (
-            da2, da2 + "/sqlDatabases/sql_db2",
-        ),
+        (da1, f"{da1}/sqlDatabases/sql_db1"),
+        (da2, f"{da2}/sqlDatabases/sql_db2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -596,9 +586,10 @@ def test_load_cassandra_keyspaces(neo4j_session):
     )
 
     expected_nodes = {
-        da1 + "/cassandraKeyspaces/cass_ks1",
-        da2 + "/cassandraKeyspaces/cass_ks2",
+        f"{da1}/cassandraKeyspaces/cass_ks1",
+        f"{da2}/cassandraKeyspaces/cass_ks2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -626,13 +617,10 @@ def test_load_cassandra_keyspaces_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            da1, da1 + "/cassandraKeyspaces/cass_ks1",
-        ),
-        (
-            da2, da2 + "/cassandraKeyspaces/cass_ks2",
-        ),
+        (da1, f"{da1}/cassandraKeyspaces/cass_ks1"),
+        (da2, f"{da2}/cassandraKeyspaces/cass_ks2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -656,9 +644,10 @@ def test_load_mongodb_databases(neo4j_session):
     )
 
     expected_nodes = {
-        da1 + "/mongodbDatabases/mongo_db1",
-        da2 + "/mongodbDatabases/mongo_db2",
+        f"{da1}/mongodbDatabases/mongo_db1",
+        f"{da2}/mongodbDatabases/mongo_db2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -686,13 +675,10 @@ def test_load_mongodb_databases_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            da1, da1 + "/mongodbDatabases/mongo_db1",
-        ),
-        (
-            da2, da2 + "/mongodbDatabases/mongo_db2",
-        ),
+        (da1, f"{da1}/mongodbDatabases/mongo_db1"),
+        (da2, f"{da2}/mongodbDatabases/mongo_db2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -715,10 +701,7 @@ def test_load_table_resources(neo4j_session):
         TEST_UPDATE_TAG,
     )
 
-    expected_nodes = {
-        da1 + "/tables/table1",
-        da2 + "/tables/table2",
-    }
+    expected_nodes = {f"{da1}/tables/table1", f"{da2}/tables/table2"}
 
     nodes = neo4j_session.run(
         """
@@ -745,14 +728,7 @@ def test_load_table_resources_relationships(neo4j_session):
         TEST_UPDATE_TAG,
     )
 
-    expected = {
-        (
-            da1, da1 + "/tables/table1",
-        ),
-        (
-            da2, da2 + "/tables/table2",
-        ),
-    }
+    expected = {(da1, f"{da1}/tables/table1"), (da2, f"{da2}/tables/table2")}
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -776,9 +752,10 @@ def test_load_sql_containers(neo4j_session):
     )
 
     expected_nodes = {
-        da1 + "/sqlDatabases/sql_db1/sqlContainers/con1",
-        da2 + "/sqlDatabases/sql_db2/sqlContainers/con2",
+        f"{da1}/sqlDatabases/sql_db1/sqlContainers/con1",
+        f"{da2}/sqlDatabases/sql_db2/sqlContainers/con2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -806,12 +783,15 @@ def test_load_sql_containers_relationships(neo4j_session):
 
     expected = {
         (
-            da1 + "/sqlDatabases/sql_db1", da1 + "/sqlDatabases/sql_db1/sqlContainers/con1",
+            f"{da1}/sqlDatabases/sql_db1",
+            f"{da1}/sqlDatabases/sql_db1/sqlContainers/con1",
         ),
         (
-            da2 + "/sqlDatabases/sql_db2", da2 + "/sqlDatabases/sql_db2/sqlContainers/con2",
+            f"{da2}/sqlDatabases/sql_db2",
+            f"{da2}/sqlDatabases/sql_db2/sqlContainers/con2",
         ),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -835,9 +815,10 @@ def test_load_cassandra_tables(neo4j_session):
     )
 
     expected_nodes = {
-        da1 + "/cassandraKeyspaces/cass_ks1/cassandraTables/table1",
-        da2 + "/cassandraKeyspaces/cass_ks2/cassandraTables/table2",
+        f"{da1}/cassandraKeyspaces/cass_ks1/cassandraTables/table1",
+        f"{da2}/cassandraKeyspaces/cass_ks2/cassandraTables/table2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -865,12 +846,15 @@ def test_load_cassandra_tables_relationships(neo4j_session):
 
     expected = {
         (
-            da1 + "/cassandraKeyspaces/cass_ks1", da1 + "/cassandraKeyspaces/cass_ks1/cassandraTables/table1",
+            f"{da1}/cassandraKeyspaces/cass_ks1",
+            f"{da1}/cassandraKeyspaces/cass_ks1/cassandraTables/table1",
         ),
         (
-            da2 + "/cassandraKeyspaces/cass_ks2", da2 + "/cassandraKeyspaces/cass_ks2/cassandraTables/table2",
+            f"{da2}/cassandraKeyspaces/cass_ks2",
+            f"{da2}/cassandraKeyspaces/cass_ks2/cassandraTables/table2",
         ),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -894,9 +878,10 @@ def test_load_collections(neo4j_session):
     )
 
     expected_nodes = {
-        da1 + "/mongodbDatabases/mongo_db1/mongodbCollections/col1",
-        da2 + "/mongodbDatabases/mongo_db2/mongodbCollections/col2",
+        f"{da1}/mongodbDatabases/mongo_db1/mongodbCollections/col1",
+        f"{da2}/mongodbDatabases/mongo_db2/mongodbCollections/col2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -924,12 +909,15 @@ def test_load_collections_relationships(neo4j_session):
 
     expected = {
         (
-            da1 + "/mongodbDatabases/mongo_db1", da1 + "/mongodbDatabases/mongo_db1/mongodbCollections/col1",
+            f"{da1}/mongodbDatabases/mongo_db1",
+            f"{da1}/mongodbDatabases/mongo_db1/mongodbCollections/col1",
         ),
         (
-            da2 + "/mongodbDatabases/mongo_db2", da2 + "/mongodbDatabases/mongo_db2/mongodbCollections/col2",
+            f"{da2}/mongodbDatabases/mongo_db2",
+            f"{da2}/mongodbDatabases/mongo_db2/mongodbCollections/col2",
         ),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(

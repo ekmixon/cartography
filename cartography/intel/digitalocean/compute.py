@@ -44,7 +44,7 @@ def get_droplets(manager: Manager) -> list:
 
 @timeit
 def transform_droplets(droplets_res: list, account_id: str, projects_resources: dict) -> list:
-    droplets = list()
+    droplets = []
     for d in droplets_res:
         droplet = {
             'id': d.id,
@@ -72,11 +72,15 @@ def transform_droplets(droplets_res: list, account_id: str, projects_resources: 
 
 @timeit
 def _get_project_id_for_droplet(droplet_id: int, project_resources: dict) -> Optional[str]:
-    for project_id, resource_list in project_resources.items():
-        droplet_resource_name = "do:droplet:" + str(droplet_id)
-        if droplet_resource_name in resource_list:
-            return project_id
-    return None
+    droplet_resource_name = f"do:droplet:{droplet_id}"
+    return next(
+        (
+            project_id
+            for project_id, resource_list in project_resources.items()
+            if droplet_resource_name in resource_list
+        ),
+        None,
+    )
 
 
 @timeit

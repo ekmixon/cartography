@@ -36,14 +36,13 @@ def sync_account(
 
 @timeit
 def transform_account(account_res: Account) -> dict:
-    account = {
+    return {
         'id': account_res.uuid,
         'uuid': account_res.uuid,
         'droplet_limit': account_res.droplet_limit,
         'floating_ip_limit': account_res.floating_ip_limit,
         'status': account_res.status,
     }
-    return account
 
 
 @timeit

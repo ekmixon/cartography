@@ -38,7 +38,7 @@ def _get_error_reason(http_error: HttpError) -> str:
             reason = data['error']['errors'][0]['reason']
         else:
             reason = data[0]['error']['errors']['reason']
-    except (UnicodeDecodeError, ValueError, KeyError):
+    except (ValueError, KeyError):
         logger.warning(f"HttpError: {data}")
         return ''
     return reason
@@ -254,14 +254,16 @@ def transform_gcp_vpcs(vpc_res: Dict) -> List[Dict]:
     prefix = vpc_res['id']
     projectid = prefix.split('/')[1]
     for v in vpc_res.get('items', []):
-        vpc = {}
         partial_uri = f"{prefix}/{v['name']}"
 
-        vpc['partial_uri'] = partial_uri
-        vpc['name'] = v['name']
-        vpc['self_link'] = v['selfLink']
-        vpc['project_id'] = projectid
-        vpc['auto_create_subnetworks'] = v.get('autoCreateSubnetworks', None)
+        vpc = {
+            'partial_uri': partial_uri,
+            'name': v['name'],
+            'self_link': v['selfLink'],
+            'project_id': projectid,
+            'auto_create_subnetworks': v.get('autoCreateSubnetworks', None),
+        }
+
         vpc['description'] = v.get('description', None)
         vpc['routing_config_routing_mode'] = v.get('routingConfig', {}).get('routingMode', None)
 
@@ -282,16 +284,16 @@ def transform_gcp_subnets(subnet_res: Dict) -> List[Dict]:
     projectid = prefix.split('/')[1]
     subnet_list: List[Dict] = []
     for s in subnet_res.get('items', []):
-        subnet = {}
-
         # Has the form `projects/{project}/regions/{region}/subnetworks/{subnet_name}`
         partial_uri = f"{prefix}/{s['name']}"
-        subnet['id'] = partial_uri
-        subnet['partial_uri'] = partial_uri
-
-        # Let's maintain an on-node reference to the VPC that this subnet belongs to.
-        subnet['vpc_self_link'] = s['network']
-        subnet['vpc_partial_uri'] = _parse_compute_full_uri_to_partial_uri(s['network'])
+        subnet = {
+            'id': partial_uri,
+            'partial_uri': partial_uri,
+            'vpc_self_link': s['network'],
+            'vpc_partial_uri': _parse_compute_full_uri_to_partial_uri(
+                s['network']
+            ),
+        }
 
         subnet['name'] = s['name']
         subnet['project_id'] = projectid
@@ -317,13 +319,13 @@ def transform_gcp_forwarding_rules(fwd_response: Resource) -> List[Dict]:
     prefix = fwd_response['id']
     project_id = prefix.split('/')[1]
     for fwd in fwd_response.get('items', []):
-        forwarding_rule: Dict[str, Any] = {}
-
         fwd_partial_uri = f"{prefix}/{fwd['name']}"
-        forwarding_rule['id'] = fwd_partial_uri
-        forwarding_rule['partial_uri'] = fwd_partial_uri
+        forwarding_rule: Dict[str, Any] = {
+            'id': fwd_partial_uri,
+            'partial_uri': fwd_partial_uri,
+            'project_id': project_id,
+        }
 
-        forwarding_rule['project_id'] = project_id
         # Region looks like "https://www.googleapis.com/compute/v1/projects/{project}/regions/{region name}"
         region = fwd.get('region', None)
         forwarding_rule['region'] = region.split('/')[-1] if region else None
@@ -336,19 +338,16 @@ def transform_gcp_forwarding_rules(fwd_response: Resource) -> List[Dict]:
         forwarding_rule['port_range'] = fwd.get('portRange', None)
         forwarding_rule['ports'] = fwd.get('ports', None)
         forwarding_rule['self_link'] = fwd['selfLink']
-        target = fwd.get('target', None)
-        if target:
+        if target := fwd.get('target', None):
             forwarding_rule['target'] = _parse_compute_full_uri_to_partial_uri(target)
         else:
             forwarding_rule['target'] = None
 
-        network = fwd.get('network', None)
-        if network:
+        if network := fwd.get('network', None):
             forwarding_rule['network'] = network
             forwarding_rule['network_partial_uri'] = _parse_compute_full_uri_to_partial_uri(network)
 
-        subnetwork = fwd.get('subnetwork', None)
-        if subnetwork:
+        if subnetwork := fwd.get('subnetwork', None):
             forwarding_rule['subnetwork'] = subnetwork
             forwarding_rule['subnetwork_partial_uri'] = _parse_compute_full_uri_to_partial_uri(subnetwork)
 
@@ -375,7 +374,7 @@ def transform_gcp_firewall(fw_response: Resource) -> List[Dict]:
         fw['transformed_deny_list'] = []
         # Mark whether this FW is defined on a target service account.
         # In future we will need to ingest GCP IAM objects but for now we simply mark the presence of svc accounts here.
-        fw['has_target_service_accounts'] = True if 'targetServiceAccounts' in fw else False
+        fw['has_target_service_accounts'] = 'targetServiceAccounts' in fw
 
         for allow_rule in fw.get('allowed', []):
             transformed_allow_rules = _transform_fw_entry(allow_rule, fw_partial_uri, is_allow_rule=True)
@@ -418,26 +417,21 @@ def _transform_fw_entry(rule: Dict, fw_partial_uri: str, is_allow_rule: bool) ->
     protocol = rule['IPProtocol']
 
     # If the protocol covered is TCP or UDP then we need to handle ports
-    if protocol == 'tcp' or protocol == 'udp':
+    if protocol in ['tcp', 'udp']:
 
         # If ports are specified then create rules for each port and range
         if 'ports' in rule:
             for port in rule['ports']:
                 rule = _parse_port_string_to_rule(port, protocol, fw_partial_uri, is_allow_rule)
                 result.append(rule)
-            return result
-
-        # If ports are not specified then the rule applies to every port
         else:
             rule = _parse_port_string_to_rule('0-65535', protocol, fw_partial_uri, is_allow_rule)
             result.append(rule)
-            return result
-
-    # The protocol is  ICMP, ESP, AH, IPIP, SCTP, or proto numbers and ports don't apply
     else:
         rule = _parse_port_string_to_rule(None, protocol, fw_partial_uri, is_allow_rule)
         result.append(rule)
-        return result
+
+    return result
 
 
 def _parse_port_string_to_rule(port: Optional[str], protocol: str, fw_partial_uri: str, is_allow_rule: bool) -> Dict:
@@ -478,14 +472,12 @@ def _parse_port_string_to_rule(port: Optional[str], protocol: str, fw_partial_ur
         # Port range
         if len(port_split) == 2:
             port_range_str = f"{port_split[0]}to{port_split[1]}"
-            fromport = int(port_split[0])
             toport = int(port_split[1])
-        # Single port
         else:
             port_range_str = f"{port_split[0]}"
-            fromport = int(port_split[0])
             toport = int(port_split[0])
 
+        fromport = int(port_split[0])
     rule_type = 'allow' if is_allow_rule else 'deny'
 
     return {
@@ -977,10 +969,7 @@ def _attach_firewall_rules(neo4j_session: neo4j.Session, fw: Resource, gcp_updat
     SET r.lastupdated = {gcp_update_tag}
     """)
     for list_type in 'transformed_allow_list', 'transformed_deny_list':
-        if list_type == 'transformed_allow_list':
-            label = "ALLOWED_BY"
-        else:
-            label = "DENIED_BY"
+        label = "ALLOWED_BY" if list_type == 'transformed_allow_list' else "DENIED_BY"
         for rule in fw[list_type]:
             # It is possible for sourceRanges to not be specified for this rule
             # If sourceRanges is not specified then the rule must specify sourceTags.
@@ -1200,11 +1189,7 @@ def _zones_to_regions(zones: List[str]) -> List[Set]:
     :param zones: List of zones. This is the output from `get_zones_in_project()`.
     :return: List of regions available to the project
     """
-    regions = set()
-    for zone in zones:
-        # Chop off the last 2 chars to turn the zone to a region
-        region = zone['name'][:-2]     # type: ignore
-        regions.add(region)
+    regions = {zone['name'][:-2] for zone in zones}
     return list(regions)     # type: ignore
 
 
@@ -1225,13 +1210,11 @@ def sync(
     """
     logger.info("Syncing Compute objects for project %s.", project_id)
     zones = get_zones_in_project(project_id, compute)
-    # Only pull additional assets for this project if the Compute API is enabled
     if zones is None:
         return
-    else:
-        regions = _zones_to_regions(zones)
-        sync_gcp_vpcs(neo4j_session, compute, project_id, gcp_update_tag, common_job_parameters)
-        sync_gcp_firewall_rules(neo4j_session, compute, project_id, gcp_update_tag, common_job_parameters)
-        sync_gcp_subnets(neo4j_session, compute, project_id, regions, gcp_update_tag, common_job_parameters)
-        sync_gcp_instances(neo4j_session, compute, project_id, zones, gcp_update_tag, common_job_parameters)
-        sync_gcp_forwarding_rules(neo4j_session, compute, project_id, regions, gcp_update_tag, common_job_parameters)
+    regions = _zones_to_regions(zones)
+    sync_gcp_vpcs(neo4j_session, compute, project_id, gcp_update_tag, common_job_parameters)
+    sync_gcp_firewall_rules(neo4j_session, compute, project_id, gcp_update_tag, common_job_parameters)
+    sync_gcp_subnets(neo4j_session, compute, project_id, regions, gcp_update_tag, common_job_parameters)
+    sync_gcp_instances(neo4j_session, compute, project_id, zones, gcp_update_tag, common_job_parameters)
+    sync_gcp_forwarding_rules(neo4j_session, compute, project_id, regions, gcp_update_tag, common_job_parameters)

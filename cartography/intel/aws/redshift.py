@@ -130,14 +130,14 @@ def _attach_iam_roles(neo4j_session: neo4j.Session, cluster: Dict, aws_update_ta
 
 @timeit
 def _attach_aws_vpc(neo4j_session: neo4j.Session, cluster: Dict, aws_update_tag: int) -> None:
-    attach_cluster_to_vpc = """
+    if cluster.get('VpcId'):
+        attach_cluster_to_vpc = """
     MATCH (c:RedshiftCluster{id:{ClusterArn}})
     MERGE (v:AWSVpc{id:{VpcId}})
     MERGE (c)-[m:MEMBER_OF_AWS_VPC]->(v)
     ON CREATE SET m.firstseen = timestamp()
     SET m.lastupdated = {aws_update_tag}
     """
-    if cluster.get('VpcId'):
         neo4j_session.run(
             attach_cluster_to_vpc,
             ClusterArn=cluster['arn'],

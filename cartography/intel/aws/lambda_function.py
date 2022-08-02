@@ -22,8 +22,7 @@ def get_lambda_data(boto3_session: boto3.session.Session, region: str) -> List[D
     paginator = client.get_paginator('list_functions')
     lambda_functions = []
     for page in paginator.paginate():
-        for each_function in page['Functions']:
-            lambda_functions.append(each_function)
+        lambda_functions.extend(iter(page['Functions']))
     return lambda_functions
 
 

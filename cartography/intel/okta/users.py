@@ -22,13 +22,10 @@ def _create_user_client(okta_org: str, okta_api_key: str) -> UsersClient:
     :param okta_api_key: Okta API key
     :return: Instance of UsersClient
     """
-    # https://github.com/okta/okta-sdk-python/blob/master/okta/models/user/User.py
-    user_client = UsersClient(
+    return UsersClient(
         base_url=f"https://{okta_org}.okta.com/",
         api_token=okta_api_key,
     )
-
-    return user_client
 
 
 @timeit
@@ -74,15 +71,15 @@ def transform_okta_user(okta_user: User) -> Dict:
     """
 
     # https://github.com/okta/okta-sdk-python/blob/master/okta/models/user/User.py
-    user_props = {}
-    user_props["first_name"] = okta_user.profile.firstName
-    user_props["last_name"] = okta_user.profile.lastName
-    user_props["login"] = okta_user.profile.login
-    user_props["email"] = okta_user.profile.email
+    user_props = {
+        "first_name": okta_user.profile.firstName,
+        "last_name": okta_user.profile.lastName,
+        "login": okta_user.profile.login,
+        "email": okta_user.profile.email,
+        "id": okta_user.id,
+        "created": okta_user.created.strftime("%m/%d/%Y, %H:%M:%S"),
+    }
 
-    # https://github.com/okta/okta-sdk-python/blob/master/okta/models/user/User.py
-    user_props["id"] = okta_user.id
-    user_props["created"] = okta_user.created.strftime("%m/%d/%Y, %H:%M:%S")
     if okta_user.activated:
         user_props["activated"] = okta_user.activated.strftime("%m/%d/%Y, %H:%M:%S")
     else:
@@ -108,11 +105,7 @@ def transform_okta_user(okta_user: User) -> Dict:
     else:
         user_props["password_changed"] = None
 
-    if okta_user.transitioningToStatus:
-        user_props["transition_to_status"] = okta_user.transitioningToStatus
-    else:
-        user_props["transition_to_status"] = None
-
+    user_props["transition_to_status"] = okta_user.transitioningToStatus or None
     return user_props
 
 

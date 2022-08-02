@@ -38,40 +38,39 @@ def evaluate_notaction_for_permission(statement: Dict, permission: str) -> bool:
     """Return whether an IAM 'notaction' clause in the given statement applies to the item"""
     if 'notaction' not in statement:
         return False
-    for clause in statement['notaction']:
-        if evaluate_clause(clause, permission):
-            return True
-    return False
+    return any(
+        evaluate_clause(clause, permission)
+        for clause in statement['notaction']
+    )
 
 
 def evaluate_action_for_permission(statement: Dict, permission: str) -> bool:
     """Return whether an IAM 'action' clause in the given statement applies to the permission"""
     if 'action' not in statement:
         return True
-    for clause in statement['action']:
-        if evaluate_clause(clause, permission):
-            return True
-    return False
+    return any(
+        evaluate_clause(clause, permission) for clause in statement['action']
+    )
 
 
 def evaluate_resource_for_permission(statement: Dict, resource_arn: str) -> bool:
     """Return whether the given IAM 'resource' statement applies to the resource_arn"""
     if 'resource' not in statement:
         return False
-    for clause in statement['resource']:
-        if evaluate_clause(clause, resource_arn):
-            return True
-    return False
+    return any(
+        evaluate_clause(clause, resource_arn)
+        for clause in statement['resource']
+    )
 
 
 def evaluate_notresource_for_permission(statement: Dict, resource_arn: str) -> bool:
     """Return whether an IAM 'notresource' clause in the given statement applies to the resource_arn"""
     if 'notresource' not in statement:
         return False
-    for clause in statement['notresource']:
-        if evaluate_clause(clause, resource_arn):
-            return True
-    return False
+    return any(
+        evaluate_clause(clause, resource_arn)
+        for clause in statement['notresource']
+    )
 
 
 def evaluate_statements_for_permission(statements: List[Dict], permission: str, resource_arn: str) -> bool:
@@ -86,14 +85,19 @@ def evaluate_statements_for_permission(statements: List[Dict], permission: str, 
         [bool] -- If the statement grants the specific permission to the resource
     """
     allowed = False
-    for statement in statements:
-        if not evaluate_notaction_for_permission(statement, permission):
-            if evaluate_action_for_permission(statement, permission):
-                if evaluate_resource_for_permission(statement, resource_arn):
-                    if not evaluate_notresource_for_permission(statement, resource_arn):
-                        return True
-
-    return allowed
+    return next(
+        (
+            True
+            for statement in statements
+            if not evaluate_notaction_for_permission(statement, permission)
+            and evaluate_action_for_permission(statement, permission)
+            and evaluate_resource_for_permission(statement, resource_arn)
+            and not evaluate_notresource_for_permission(
+                statement, resource_arn
+            )
+        ),
+        allowed,
+    )
 
 
 def evaluate_policy_for_permissions(
@@ -121,10 +125,9 @@ def evaluate_policy_for_permissions(
         if evaluate_statements_for_permission(deny_statements, permission, resource_arn):
             # The action explicitly denied then no other policy can override it
             return False, True
-        else:
-            if evaluate_statements_for_permission(allow_statements, permission, resource_arn):
-                # The action is allowed by this policy
-                return True, False
+        if evaluate_statements_for_permission(allow_statements, permission, resource_arn):
+            # The action is allowed by this policy
+            return True, False
     # The action is not allowed by this policy, but not specifically denied either
     return False, False
 
@@ -178,9 +181,14 @@ def calculate_permission_relationships(
     """
     allowed_mappings: List[Dict] = []
     for resource_arn in resource_arns:
-        for principal_arn, policies in principals.items():
-            if principal_allowed_on_resource(policies, resource_arn, permissions):
-                allowed_mappings.append({"principal_arn": principal_arn, "resource_arn": resource_arn})
+        allowed_mappings.extend(
+            {"principal_arn": principal_arn, "resource_arn": resource_arn}
+            for principal_arn, policies in principals.items()
+            if principal_allowed_on_resource(
+                policies, resource_arn, permissions
+            )
+        )
+
     return allowed_mappings
 
 
@@ -211,17 +219,16 @@ def compile_regex(item: str) -> Pattern:
         If the pattern does not compile it will return an re.Pattern of empty string
     """
 
-    if isinstance(item, str):
-        item = item.replace(".", "\\.").replace("*", ".*").replace("?", ".?")
-        try:
-            return re.compile(item, flags=re.IGNORECASE)
-        except re.error:
-            logger.warning(f"Regex did not compile for {item}")
-            # in this case it must still return a regex.
-            # So it will return an re.Pattern of empry stringm
-            return re.compile("", flags=re.IGNORECASE)
-    else:
+    if not isinstance(item, str):
         return item
+    item = item.replace(".", "\\.").replace("*", ".*").replace("?", ".?")
+    try:
+        return re.compile(item, flags=re.IGNORECASE)
+    except re.error:
+        logger.warning(f"Regex did not compile for {item}")
+        # in this case it must still return a regex.
+        # So it will return an re.Pattern of empry stringm
+        return re.compile("", flags=re.IGNORECASE)
 
 
 def compile_statement(statements: List[Any]) -> List[Any]:
@@ -277,8 +284,7 @@ def get_resource_arns(neo4j_session: neo4j.Session, account_id: str, node_label:
         get_resource_query_template,
         AccountId=account_id,
     )
-    arns = [r["arn"] for r in results]
-    return arns
+    return [r["arn"] for r in results]
 
 
 def load_principal_mappings(
@@ -346,11 +352,7 @@ def parse_permission_relationships_file(file_path: str) -> List[Any]:
 
 def is_valid_rpr(rpr: Dict) -> bool:
     required_fields = ["permissions", "relationship_name", "target_label"]
-    for field in required_fields:
-        if field not in rpr:
-            return False
-
-    return True
+    return all(field in rpr for field in required_fields)
 
 
 @timeit
@@ -363,9 +365,9 @@ def sync(
     pr_file = common_job_parameters["permission_relationships_file"]
     if not pr_file:
         logger.warning(
-            f"Permission relationships file was not specified, skipping. If this is not expected, please check your "
-            f"value of --permission-relationships-file",
+            'Permission relationships file was not specified, skipping. If this is not expected, please check your value of --permission-relationships-file'
         )
+
         return
     relationship_mapping = parse_permission_relationships_file(pr_file)
     for rpr in relationship_mapping:

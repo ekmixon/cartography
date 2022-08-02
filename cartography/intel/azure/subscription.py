@@ -31,14 +31,15 @@ def get_all_azure_subscriptions(credentials: Credentials) -> List[Dict]:
 
         return []
 
-    subscriptions = []
-    for sub in subs:
-        subscriptions.append({
+    subscriptions = [
+        {
             'id': sub.id,
             'subscriptionId': sub.subscription_id,
             'displayName': sub.display_name,
             'state': sub.state,
-        })
+        }
+        for sub in subs
+    ]
 
     return subscriptions
 

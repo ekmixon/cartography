@@ -51,15 +51,12 @@ def _sync_one_account(
     )
 
     for func_name in aws_requested_syncs:
-        if func_name in RESOURCE_FUNCTIONS:
-            # Skip permission relationships and tags for now because they rely on data already being in the graph
-            if func_name not in ['permission_relationships', 'resourcegroupstaggingapi']:
-                RESOURCE_FUNCTIONS[func_name](**sync_args)
-            else:
-                continue
-        else:
+        if func_name not in RESOURCE_FUNCTIONS:
             raise ValueError(f'AWS sync function "{func_name}" was specified but does not exist. Did you misspell it?')
 
+            # Skip permission relationships and tags for now because they rely on data already being in the graph
+        if func_name not in ['permission_relationships', 'resourcegroupstaggingapi']:
+            RESOURCE_FUNCTIONS[func_name](**sync_args)
     # NOTE clean up all DNS records, regardless of which job created them
     run_cleanup_job('aws_account_dns_cleanup.json', neo4j_session, common_job_parameters)
 

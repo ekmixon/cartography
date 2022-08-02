@@ -109,32 +109,16 @@ def transform_okta_group(okta_group: UserGroup) -> Dict:
     :param okta_group: okta group object
     :return: Dictionary representing the group properties
     """
-    # https://github.com/okta/okta-sdk-python/blob/master/okta/models/usergroup/UserGroup.py
-    group_props = {}
-    group_props["id"] = okta_group.id
-    group_props["name"] = okta_group.profile.name
-    group_props["description"] = okta_group.profile.description
-    if okta_group.profile.samAccountName:
-        group_props["sam_account_name"] = okta_group.profile.samAccountName
-    else:
-        group_props["sam_account_name"] = None
-
-    if okta_group.profile.dn:
-        group_props["dn"] = okta_group.profile.dn
-    else:
-        group_props["dn"] = None
-
-    if okta_group.profile.windowsDomainQualifiedName:
-        group_props["windows_domain_qualified_name"] = okta_group.profile.windowsDomainQualifiedName
-    else:
-        group_props["windows_domain_qualified_name"] = None
-
-    if okta_group.profile.externalId:
-        group_props["external_id"] = okta_group.profile.externalId
-    else:
-        group_props["external_id"] = None
-
-    return group_props
+    return {
+        "id": okta_group.id,
+        "name": okta_group.profile.name,
+        "description": okta_group.profile.description,
+        "sam_account_name": okta_group.profile.samAccountName or None,
+        "dn": okta_group.profile.dn or None,
+        "windows_domain_qualified_name": okta_group.profile.windowsDomainQualifiedName
+        or None,
+        "external_id": okta_group.profile.externalId or None,
+    }
 
 
 @ timeit
@@ -157,9 +141,7 @@ def transform_okta_group_member(raw_json_response: str) -> List[str]:
     member_list: List[str] = []
     member_results = json.loads(raw_json_response)
 
-    for member in member_results:
-        member_list.append(member["id"])
-
+    member_list.extend(member["id"] for member in member_results)
     return member_list
 
 

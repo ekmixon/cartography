@@ -23,13 +23,10 @@ def _create_factor_client(okta_org: str, okta_api_key: str) -> FactorsClient:
     :return: Instance of FactorsClient
     """
 
-    # https://github.com/okta/okta-sdk-python/blob/master/okta/FactorsClient.py
-    factor_client = FactorsClient(
+    return FactorsClient(
         base_url=f"https://{okta_org}.okta.com/",
         api_token=okta_api_key,
     )
-
-    return factor_client
 
 
 @timeit
@@ -56,12 +53,7 @@ def _get_factor_for_user_id(factor_client: FactorsClient, user_id: str) -> List[
 
 @timeit
 def transform_okta_user_factor_list(okta_factor_list: List[Factor]) -> List[Dict]:
-    factors = []
-
-    for current in okta_factor_list:
-        factors.append(transform_okta_user_factor(current))
-
-    return factors
+    return [transform_okta_user_factor(current) for current in okta_factor_list]
 
 
 @timeit
@@ -73,15 +65,15 @@ def transform_okta_user_factor(okta_factor_info: Factor) -> Dict:
     """
 
     # https://github.com/okta/okta-sdk-python/blob/master/okta/models/factor/Factor.py
-    factor_props = {}
-    factor_props["id"] = okta_factor_info.id
-    factor_props["factor_type"] = okta_factor_info.factorType
-    factor_props["provider"] = okta_factor_info.provider
-    factor_props["status"] = okta_factor_info.status
-    if okta_factor_info.created:
-        factor_props["created"] = okta_factor_info.created.strftime("%m/%d/%Y, %H:%M:%S")
-    else:
-        factor_props["created"] = None
+    factor_props = {
+        "id": okta_factor_info.id,
+        "factor_type": okta_factor_info.factorType,
+        "provider": okta_factor_info.provider,
+        "status": okta_factor_info.status,
+        "created": okta_factor_info.created.strftime("%m/%d/%Y, %H:%M:%S")
+        if okta_factor_info.created
+        else None,
+    }
 
     if okta_factor_info.lastUpdated:
         factor_props["okta_last_updated"] = okta_factor_info.lastUpdated.strftime("%m/%d/%Y, %H:%M:%S")

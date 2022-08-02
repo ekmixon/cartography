@@ -91,15 +91,15 @@ DESCRIBE_DATABASE_ACCOUNTS = [
         ],
         "private_endpoint_connections": [
             {
-                "id": da1 + "/privateEndpointConnections/pe1",
+                "id": f"{da1}/privateEndpointConnections/pe1",
                 "private_endpoint": {
-                    "id": rg + "/providers/Microsoft.Network/privateEndpoints/pe1",
+                    "id": f"{rg}/providers/Microsoft.Network/privateEndpoints/pe1"
                 },
                 "private_link_service_connection_state": {
                     "status": "Approved",
                     "actions_required": "None",
                 },
-            },
+            }
         ],
         "cors": [
             {
@@ -109,9 +109,9 @@ DESCRIBE_DATABASE_ACCOUNTS = [
         ],
         "virtual_network_rules": [
             {
-                "id": rg + "/providers/Microsoft.Network/virtualNetworks/vn1",
+                "id": f"{rg}/providers/Microsoft.Network/virtualNetworks/vn1",
                 "ignore_missing_v_net_service_endpoint": False,
-            },
+            }
         ],
     },
     {
@@ -145,15 +145,15 @@ DESCRIBE_DATABASE_ACCOUNTS = [
         ],
         "private_endpoint_connections": [
             {
-                "id": da2 + "/privateEndpointConnections/pe2",
+                "id": f"{da2}/privateEndpointConnections/pe2",
                 "private_endpoint": {
-                    "id": rg + "/providers/Microsoft.Network/privateEndpoints/pe2",
+                    "id": f"{rg}/providers/Microsoft.Network/privateEndpoints/pe2"
                 },
                 "private_link_service_connection_state": {
                     "status": "Approved",
                     "actions_required": "None",
                 },
-            },
+            }
         ],
         "cors": [
             {
@@ -163,16 +163,17 @@ DESCRIBE_DATABASE_ACCOUNTS = [
         ],
         "virtual_network_rules": [
             {
-                "id": rg + "/providers/Microsoft.Network/virtualNetworks/vn2",
+                "id": f"{rg}/providers/Microsoft.Network/virtualNetworks/vn2",
                 "ignore_missing_v_net_service_endpoint": False,
-            },
+            }
         ],
     },
 ]
 
+
 DESCRIBE_SQL_DATABASES = [
     {
-        "id": da1 + "/sqlDatabases/sql_db1",
+        "id": f"{da1}/sqlDatabases/sql_db1",
         "name": "sql_db1",
         "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
         "location": "West US",
@@ -186,7 +187,7 @@ DESCRIBE_SQL_DATABASES = [
         "database_account_id": da1,
     },
     {
-        "id": da2 + "/sqlDatabases/sql_db2",
+        "id": f"{da2}/sqlDatabases/sql_db2",
         "name": "sql_db2",
         "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
         "location": "West US",
@@ -201,9 +202,10 @@ DESCRIBE_SQL_DATABASES = [
     },
 ]
 
+
 DESCRIBE_CASSANDRA_KEYSPACES = [
     {
-        "id": da1 + "/cassandraKeyspaces/cass_ks1",
+        "id": f"{da1}/cassandraKeyspaces/cass_ks1",
         "name": "cass_ks1",
         "type": "Microsoft.DocumentDB/databaseAccounts/cassandraKeyspaces",
         "location": "West US",
@@ -216,7 +218,7 @@ DESCRIBE_CASSANDRA_KEYSPACES = [
         "database_account_id": da1,
     },
     {
-        "id": da2 + "/cassandraKeyspaces/cass_ks2",
+        "id": f"{da2}/cassandraKeyspaces/cass_ks2",
         "name": "cass_ks2",
         "type": "Microsoft.DocumentDB/databaseAccounts/cassandraKeyspaces",
         "location": "West US",
@@ -230,9 +232,10 @@ DESCRIBE_CASSANDRA_KEYSPACES = [
     },
 ]
 
+
 DESCRIBE_MONGODB_DATABASES = [
     {
-        "id": da1 + "/mongodbDatabases/mongo_db1",
+        "id": f"{da1}/mongodbDatabases/mongo_db1",
         "name": "mongo_db1",
         "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases",
         "location": "West US",
@@ -245,7 +248,7 @@ DESCRIBE_MONGODB_DATABASES = [
         "database_account_id": da1,
     },
     {
-        "id": da2 + "/mongodbDatabases/mongo_db2",
+        "id": f"{da2}/mongodbDatabases/mongo_db2",
         "name": "mongo_db2",
         "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases",
         "location": "West US",
@@ -259,9 +262,10 @@ DESCRIBE_MONGODB_DATABASES = [
     },
 ]
 
+
 DESCRIBE_TABLE_RESOURCES = [
     {
-        "id": da1 + "/tables/table1",
+        "id": f"{da1}/tables/table1",
         "name": "table1",
         "type": "Microsoft.DocumentDB/databaseAccounts/tables",
         "location": "West US",
@@ -274,7 +278,7 @@ DESCRIBE_TABLE_RESOURCES = [
         "database_account_id": da1,
     },
     {
-        "id": da2 + "/tables/table2",
+        "id": f"{da2}/tables/table2",
         "name": "table2",
         "type": "Microsoft.DocumentDB/databaseAccounts/tables",
         "location": "West US",
@@ -288,9 +292,10 @@ DESCRIBE_TABLE_RESOURCES = [
     },
 ]
 
+
 DESCRIBE_SQL_CONTAINERS = [
     {
-        "id": da1 + "/sqlDatabases/sql_db1/sqlContainers/con1",
+        "id": f"{da1}/sqlDatabases/sql_db1/sqlContainers/con1",
         "name": "con1",
         "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/sqlContainers",
         "location": "West US",
@@ -311,10 +316,10 @@ DESCRIBE_SQL_CONTAINERS = [
                 "mode": "LastWriterWins",
             },
         },
-        "database_id": da1 + "/sqlDatabases/sql_db1",
+        "database_id": f"{da1}/sqlDatabases/sql_db1",
     },
     {
-        "id": da2 + "/sqlDatabases/sql_db2/sqlContainers/con2",
+        "id": f"{da2}/sqlDatabases/sql_db2/sqlContainers/con2",
         "name": "con2",
         "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/sqlContainers",
         "location": "West US",
@@ -335,13 +340,14 @@ DESCRIBE_SQL_CONTAINERS = [
                 "mode": "LastWriterWins",
             },
         },
-        "database_id": da2 + "/sqlDatabases/sql_db2",
+        "database_id": f"{da2}/sqlDatabases/sql_db2",
     },
 ]
 
+
 DESCRIBE_CASSANDRA_TABLES = [
     {
-        "id": da1 + "/cassandraKeyspaces/cass_ks1/cassandraTables/table1",
+        "id": f"{da1}/cassandraKeyspaces/cass_ks1/cassandraTables/table1",
         "name": "table1",
         "type": "Microsoft.DocumentDB/databaseAccounts/cassandraKeyspaces/cassandraTables",
         "location": "West US",
@@ -356,10 +362,10 @@ DESCRIBE_CASSANDRA_TABLES = [
             "default_ttl": 100,
             "analytical_storage_ttl": 500,
         },
-        "keyspace_id": da1 + "/cassandraKeyspaces/cass_ks1",
+        "keyspace_id": f"{da1}/cassandraKeyspaces/cass_ks1",
     },
     {
-        "id": da2 + "/cassandraKeyspaces/cass_ks2/cassandraTables/table2",
+        "id": f"{da2}/cassandraKeyspaces/cass_ks2/cassandraTables/table2",
         "name": "table2",
         "type": "Microsoft.DocumentDB/databaseAccounts/cassandraKeyspaces/cassandraTables",
         "location": "West US",
@@ -374,13 +380,14 @@ DESCRIBE_CASSANDRA_TABLES = [
             "default_ttl": 100,
             "analytical_storage_ttl": 500,
         },
-        "keyspace_id": da2 + "/cassandraKeyspaces/cass_ks2",
+        "keyspace_id": f"{da2}/cassandraKeyspaces/cass_ks2",
     },
 ]
 
+
 DESCRIBE_MONGODB_COLLECTIONS = [
     {
-        "id": da1 + "/mongodbDatabases/mongo_db1/mongodbCollections/col1",
+        "id": f"{da1}/mongodbDatabases/mongo_db1/mongodbCollections/col1",
         "name": "col1",
         "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/mongodbCollections",
         "location": "West US",
@@ -394,10 +401,10 @@ DESCRIBE_MONGODB_COLLECTIONS = [
             "id": "testcoll",
             "analytical_storage_ttl": 500,
         },
-        "database_id": da1 + "/mongodbDatabases/mongo_db1",
+        "database_id": f"{da1}/mongodbDatabases/mongo_db1",
     },
     {
-        "id": da2 + "/mongodbDatabases/mongo_db2/mongodbCollections/col2",
+        "id": f"{da2}/mongodbDatabases/mongo_db2/mongodbCollections/col2",
         "name": "col2",
         "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/mongodbCollections",
         "location": "West US",
@@ -411,6 +418,6 @@ DESCRIBE_MONGODB_COLLECTIONS = [
             "id": "testcoll",
             "analytical_storage_ttl": 500,
         },
-        "database_id": da2 + "/mongodbDatabases/mongo_db2",
+        "database_id": f"{da2}/mongodbDatabases/mongo_db2",
     },
 ]

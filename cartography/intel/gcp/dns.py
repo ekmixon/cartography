@@ -32,21 +32,22 @@ def get_dns_zones(dns: Resource, project_id: str) -> List[Resource]:
         request = dns.managedZones().list(project=project_id)
         while request is not None:
             response = request.execute()
-            for managed_zone in response['managedZones']:
-                zones.append(managed_zone)
+            zones.extend(iter(response['managedZones']))
             request = dns.managedZones().list_next(previous_request=request, previous_response=response)
         return zones
     except HttpError as e:
         err = json.loads(e.content.decode('utf-8'))['error']
-        if err.get('status', '') == 'PERMISSION_DENIED' or err.get('message', '') == 'Forbidden':
-            logger.warning(
-                (
-                    "Could not retrieve DNS zones on project %s due to permissions issues. Code: %s, Message: %s"
-                ), project_id, err['code'], err['message'],
-            )
-            return []
-        else:
+        if (
+            err.get('status', '') != 'PERMISSION_DENIED'
+            and err.get('message', '') != 'Forbidden'
+        ):
             raise
+        logger.warning(
+            (
+                "Could not retrieve DNS zones on project %s due to permissions issues. Code: %s, Message: %s"
+            ), project_id, err['code'], err['message'],
+        )
+        return []
 
 
 @timeit
@@ -79,16 +80,17 @@ def get_dns_rrs(dns: Resource, dns_zones: List[Dict], project_id: str) -> List[R
         return rrs
     except HttpError as e:
         err = json.loads(e.content.decode('utf-8'))['error']
-        if err.get('status', '') == 'PERMISSION_DENIED' or err.get('message', '') == 'Forbidden':
-            logger.warning(
-                (
-                    "Could not retrieve DNS RRS on project %s due to permissions issues. Code: %s, Message: %s"
-                ), project_id, err['code'], err['message'],
-            )
-            return []
-        else:
+        if (
+            err.get('status', '') != 'PERMISSION_DENIED'
+            and err.get('message', '') != 'Forbidden'
+        ):
             raise
-        raise e
+        logger.warning(
+            (
+                "Could not retrieve DNS RRS on project %s due to permissions issues. Code: %s, Message: %s"
+            ), project_id, err['code'], err['message'],
+        )
+        return []
 
 
 @timeit

@@ -27,8 +27,7 @@ def get_gke_clusters(container: Resource, project_id: str) -> Dict:
     """
     try:
         req = container.projects().zones().clusters().list(projectId=project_id, zone='-')
-        res = req.execute()
-        return res
+        return req.execute()
     except HttpError as e:
         err = json.loads(e.content.decode('utf-8'))['error']
         if err['status'] == 'PERMISSION_DENIED':
@@ -140,9 +139,7 @@ def _process_network_policy(cluster: Dict) -> bool:
     """
     provider = cluster.get('networkPolicy', {}).get('provider')
     enabled = cluster.get('networkPolicy', {}).get('enabled')
-    if provider and enabled is True:
-        return provider
-    return False
+    return provider if provider and enabled is True else False
 
 
 @timeit

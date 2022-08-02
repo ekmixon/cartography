@@ -122,14 +122,13 @@ def transform(repos_json: List[Dict]) -> Dict:
         _transform_repo_owners(repo_object['owner']['url'], repo_object, transformed_repo_owners)
         _transform_collaborators(repo_object['collaborators'], repo_object['url'], transformed_collaborators)
         _transform_python_requirements(repo_object['requirements'], repo_object['url'], transformed_requirements_files)
-    results = {
+    return {
         'repos': transformed_repo_list,
         'repo_languages': transformed_repo_languages,
         'repo_owners': transformed_repo_owners,
         'repo_collaborators': transformed_collaborators,
         'python_requirements': transformed_requirements_files,
     }
-    return results
 
 
 def _create_default_branch_id(repo_url: str, default_branch_ref_id: str) -> str:
@@ -210,11 +209,13 @@ def _transform_repo_languages(repo_url: str, repo: Dict, repo_languages: List[Di
     :return: Nothing.
     """
     if repo['languages']['totalCount'] > 0:
-        for language in repo['languages']['nodes']:
-            repo_languages.append({
+        repo_languages.extend(
+            {
                 'repo_id': repo_url,
                 'language_name': language['name'],
-            })
+            }
+            for language in repo['languages']['nodes']
+        )
 
 
 def _transform_collaborators(collaborators: Dict, repo_url: str, transformed_collaborators: Dict) -> None:
@@ -243,48 +244,47 @@ def _transform_python_requirements(req_file_contents: Dict, repo_url: str, out_r
     :param out_requirements_files: Output array to append transformed results to.
     :return: Nothing.
     """
-    if req_file_contents and req_file_contents.get('text'):
-        text_contents = req_file_contents['text']
+    if not req_file_contents or not req_file_contents.get('text'):
+        return
+    text_contents = req_file_contents['text']
 
-        parsed_list = []
-        for line in text_contents.split("\n"):
-            try:
-                # Remove trailing comments and extra whitespace
-                line = line.partition('#')[0].strip()
-                req = Requirement(line)
-                parsed_list.append(req)
-            except InvalidRequirement as e:
-                logger.info(
-                    f"Failed to parse line \"{line}\" in repo {repo_url}'s requirements.txt; skipping line. "
-                    f"Details: {e}. This is probably ok since we don't support all ways to specify Python "
-                    f"requirements.",
-                )
-                continue
+    parsed_list = []
+    for line in text_contents.split("\n"):
+        try:
+            # Remove trailing comments and extra whitespace
+            line = line.partition('#')[0].strip()
+            req = Requirement(line)
+            parsed_list.append(req)
+        except InvalidRequirement as e:
+            logger.info(
+                f"Failed to parse line \"{line}\" in repo {repo_url}'s requirements.txt; skipping line. "
+                f"Details: {e}. This is probably ok since we don't support all ways to specify Python "
+                f"requirements.",
+            )
+    for req in parsed_list:
+        pinned_version = None
+        if len(req.specifier) == 1:
+            specifier = next(iter(req.specifier))
+            if specifier.operator == '==':
+                pinned_version = specifier.version
 
-        for req in parsed_list:
-            pinned_version = None
-            if len(req.specifier) == 1:
-                specifier = next(iter(req.specifier))
-                if specifier.operator == '==':
-                    pinned_version = specifier.version
+        # Set `spec` to a default value. Example values for str(req.specifier): "<4.0,>=3.0" or "==1.0.0".
+        spec: Optional[str] = str(req.specifier)
+        # Set spec to `None` instead of empty string so that the Neo4j driver will leave the library.specifier field
+        # undefined. As convention, we prefer undefined values over empty strings in the graph.
+        if spec == '':
+            spec = None
 
-            # Set `spec` to a default value. Example values for str(req.specifier): "<4.0,>=3.0" or "==1.0.0".
-            spec: Optional[str] = str(req.specifier)
-            # Set spec to `None` instead of empty string so that the Neo4j driver will leave the library.specifier field
-            # undefined. As convention, we prefer undefined values over empty strings in the graph.
-            if spec == '':
-                spec = None
+        canon_name = canonicalize_name(req.name)
+        requirement_id = f"{canon_name}|{pinned_version}" if pinned_version else canon_name
 
-            canon_name = canonicalize_name(req.name)
-            requirement_id = f"{canon_name}|{pinned_version}" if pinned_version else canon_name
-
-            out_requirements_files.append({
-                "id": requirement_id,
-                "name": canon_name,
-                "specifier": spec,
-                "version": pinned_version,
-                "repo_url": repo_url,
-            })
+        out_requirements_files.append({
+            "id": requirement_id,
+            "name": canon_name,
+            "specifier": spec,
+            "version": pinned_version,
+            "repo_url": repo_url,
+        })
 
 
 @timeit

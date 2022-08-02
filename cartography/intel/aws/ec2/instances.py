@@ -196,9 +196,7 @@ def load_ec2_instances(
                 update_tag=update_tag,
             ).consume()  # TODO see issue 170
 
-            # SubnetId can return None intermittently so attach only if non-None.
-            subnet_id = instance.get('SubnetId')
-            if subnet_id:
+            if subnet_id := instance.get('SubnetId'):
                 neo4j_session.run(
                     ingest_subnet,
                     InstanceId=instanceid,

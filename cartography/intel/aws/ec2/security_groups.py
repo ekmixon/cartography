@@ -39,7 +39,9 @@ def load_ec2_security_group_rule(neo4j_session: neo4j.Session, group: Dict, rule
     SET r.lastupdated = {update_tag};
     """)
 
-    ingest_rule_group_pair = """
+    group_id = group["GroupId"]
+    if group.get(rule_type):
+        ingest_rule_group_pair = """
     MERGE (group:EC2SecurityGroup{id: {GroupId}})
     ON CREATE SET group.firstseen = timestamp(), group.groupid = {GroupId}
     SET group.lastupdated = {update_tag}
@@ -50,7 +52,7 @@ def load_ec2_security_group_rule(neo4j_session: neo4j.Session, group: Dict, rule
     SET r.lastupdated = {update_tag}
     """
 
-    ingest_range = """
+        ingest_range = """
     MERGE (range:IpRange{id: {RangeId}})
     ON CREATE SET range.firstseen = timestamp(), range.range = {RangeId}
     SET range.lastupdated = {update_tag}
@@ -61,10 +63,8 @@ def load_ec2_security_group_rule(neo4j_session: neo4j.Session, group: Dict, rule
     SET r.lastupdated = {update_tag}
     """
 
-    group_id = group["GroupId"]
-    rule_type_map = {"IpPermissions": "IpPermissionInbound", "IpPermissionsEgress": "IpPermissionEgress"}
+        rule_type_map = {"IpPermissions": "IpPermissionInbound", "IpPermissionsEgress": "IpPermissionEgress"}
 
-    if group.get(rule_type):
         for rule in group[rule_type]:
             protocol = rule.get("IpProtocol", "all")
             from_port = rule.get("FromPort")

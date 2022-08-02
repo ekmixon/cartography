@@ -46,8 +46,7 @@ def get_group_policy_info(
 def get_group_membership_data(boto3_session: boto3.session.Session, group_name: str) -> Dict:
     client = boto3_session.client('iam')
     try:
-        memberships = client.get_group(GroupName=group_name)
-        return memberships
+        return client.get_group(GroupName=group_name)
     except client.exceptions.NoSuchEntityException:
         # Avoid crashing the sync
         logger.warning("client.get_group(GroupName='%s') failed with NoSuchEntityException; skipping.", group_name)
@@ -269,8 +268,11 @@ def _parse_principal_entries(principal: Dict) -> List[Tuple[Any, Any]]:
         principal_values = principal[principal_type]
         if not isinstance(principal_values, list):
             principal_values = [principal_values]
-        for principal_value in principal_values:
-            principal_entries.append((principal_type, principal_value))
+        principal_entries.extend(
+            (principal_type, principal_value)
+            for principal_value in principal_values
+        )
+
     return principal_entries
 
 
@@ -369,8 +371,7 @@ def get_policies_for_principal(neo4j_session: neo4j.Session, principal_arn: str)
         get_policy_query,
         Arn=principal_arn,
     )
-    policies = {r["policy_id"]: parse_statement_node(r["statements"]) for r in results}
-    return policies
+    return {r["policy_id"]: parse_statement_node(r["statements"]) for r in results}
 
 
 @timeit
@@ -697,8 +698,7 @@ def sync_user_access_keys(
     result = neo4j_session.run(query, AWS_ACCOUNT_ID=current_aws_account_id)
     usernames = [r['name'] for r in result]
     for name in usernames:
-        access_keys = get_account_access_key_data(boto3_session, name)
-        if access_keys:
+        if access_keys := get_account_access_key_data(boto3_session, name):
             account_access_keys = {name: access_keys}
             load_user_access_keys(neo4j_session, account_access_keys, aws_update_tag)
     run_cleanup_job(

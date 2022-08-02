@@ -147,9 +147,7 @@ def transform_application_assigned_users(json_app_data: str) -> List[str]:
 
     users: List[str] = []
     app_data = json.loads(json_app_data)
-    for user in app_data:
-        users.append(user["id"])
-
+    users.extend(user["id"] for user in app_data)
     return users
 
 
@@ -174,9 +172,7 @@ def transform_application_assigned_groups(json_app_data: str) -> List[str]:
     groups: List[str] = []
     app_data = json.loads(json_app_data)
 
-    for group in app_data:
-        groups.append(group["id"])
-
+    groups.extend(group["id"] for group in app_data)
     return groups
 
 
@@ -193,16 +189,17 @@ def transform_okta_application_list(okta_applications: List[Dict]) -> List[Dict]
 
 @timeit
 def transform_okta_application(okta_application: Dict) -> Dict:
-    app_props = {}
-    app_props["id"] = okta_application["id"]
-    app_props["name"] = okta_application["name"]
-    app_props["label"] = okta_application["label"]
-    if "created" in okta_application and okta_application["created"]:
-        app_props["created"] = datetime.strptime(
-            okta_application["created"], "%Y-%m-%dT%H:%M:%S.%fZ",
+    app_props = {
+        "id": okta_application["id"],
+        "name": okta_application["name"],
+        "label": okta_application["label"],
+        "created": datetime.strptime(
+            okta_application["created"],
+            "%Y-%m-%dT%H:%M:%S.%fZ",
         ).strftime("%m/%d/%Y, %H:%M:%S")
-    else:
-        app_props["created"] = None
+        if "created" in okta_application and okta_application["created"]
+        else None,
+    }
 
     if "lastUpdated" in okta_application and okta_application["lastUpdated"]:
         app_props["okta_last_updated"] = datetime.strptime(
@@ -232,9 +229,11 @@ def transform_okta_application_extract_replyurls(okta_application: Dict) -> Opti
     Extracts the reply uri information from an okta app
     """
 
-    if "oauthClient" in okta_application["settings"]:
-        if "redirect_uris" in okta_application["settings"]["oauthClient"]:
-            return okta_application["settings"]["oauthClient"]["redirect_uris"]
+    if (
+        "oauthClient" in okta_application["settings"]
+        and "redirect_uris" in okta_application["settings"]["oauthClient"]
+    ):
+        return okta_application["settings"]["oauthClient"]["redirect_uris"]
     return None
 
 

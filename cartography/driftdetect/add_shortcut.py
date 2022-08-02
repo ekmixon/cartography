@@ -24,10 +24,8 @@ def run_add_shortcut(config):
     try:
         add_shortcut(FileSystem, ShortcutSchema(), config.query_directory, config.shortcut, config.filename)
     except ValidationError as err:
-        msg = "Could not load shortcut file from json file {} in query directory {}.".format(
-            err.messages,
-            config.query_directory,
-        )
+        msg = f"Could not load shortcut file from json file {err.messages} in query directory {config.query_directory}."
+
         logger.exception(msg)
 
 

@@ -16,8 +16,9 @@ def sync(
         digitalocean_update_tag: str,
         common_job_parameters: dict,
 ) -> dict:
-    projects_resources = sync_projects(neo4j_session, manager, digitalocean_update_tag, common_job_parameters)
-    return projects_resources
+    return sync_projects(
+        neo4j_session, manager, digitalocean_update_tag, common_job_parameters
+    )
 
 
 @timeit
@@ -55,7 +56,7 @@ def get_projects_resources(projects_res: list) -> dict:
 
 @timeit
 def transform_projects(project_res: list, account_id: str) -> list:
-    result = list()
+    result = []
     for p in project_res:
         project = {
             'id': p.id,

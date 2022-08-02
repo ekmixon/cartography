@@ -24,14 +24,14 @@ server2 = "/subscriptions/00-00-00-00/resourceGroups/TestRG/providers/Microsoft.
 
 DESCRIBE_DNS_ALIASES = [
     {
-        "id": server1 + "/dnsAliases/dns-alias-1",
+        "id": f"{server1}/dnsAliases/dns-alias-1",
         "name": "server-dns-alias-1",
         "type": "Microsoft.Sql/servers/dnsAliases",
         "azure_dns_record": "dns-alias-1.database.windows.net",
         "server_id": server1,
     },
     {
-        "id": server2 + "/dnsAliases/dns-alias-2",
+        "id": f"{server2}/dnsAliases/dns-alias-2",
         "name": "server-dns-alias-2",
         "type": "Microsoft.Sql/servers/dnsAliases",
         "azure_dns_record": "dns-alias-2.database.windows.net",
@@ -40,16 +40,17 @@ DESCRIBE_DNS_ALIASES = [
 ]
 
 
+
 DESCRIBE_AD_ADMINS = [
     {
-        "id": server1 + "/providers/Microsoft.Sql/administrators/ActiveDirectory1",
+        "id": f"{server1}/providers/Microsoft.Sql/administrators/ActiveDirectory1",
         "name": "ActiveDirectory1",
         "administrator_type": "ActiveDirectory",
         "login": "DSEngAll",
         "server_id": server1,
     },
     {
-        "id": server2 + "/providers/Microsoft.Sql/administrators/ActiveDirectory2",
+        "id": f"{server2}/providers/Microsoft.Sql/administrators/ActiveDirectory2",
         "name": "ActiveDirectory2",
         "administrator_type": "ActiveDirectory",
         "login": "DSEngAll",
@@ -58,9 +59,10 @@ DESCRIBE_AD_ADMINS = [
 ]
 
 
+
 DESCRIBE_RECOVERABLE_DATABASES = [
     {
-        "id": server1 + "/recoverabledatabases/RD1",
+        "id": f"{server1}/recoverabledatabases/RD1",
         "name": "RD1",
         "type": "Microsoft.Sql/servers/recoverabledatabases",
         "edition": "Standard",
@@ -69,7 +71,7 @@ DESCRIBE_RECOVERABLE_DATABASES = [
         "server_id": server1,
     },
     {
-        "id": server2 + "/recoverabledatabases/RD2",
+        "id": f"{server2}/recoverabledatabases/RD2",
         "name": "RD2",
         "type": "Microsoft.Sql/servers/recoverabledatabases",
         "edition": "Premium",
@@ -80,9 +82,10 @@ DESCRIBE_RECOVERABLE_DATABASES = [
 ]
 
 
+
 DESCRIBE_RESTORABLE_DROPPED_DATABASES = [
     {
-        "id": server1 + "/restorableDroppedDatabases/RDD1,001",
+        "id": f"{server1}/restorableDroppedDatabases/RDD1,001",
         "name": "RDD1,001",
         "type": "Microsoft.Sql/servers/restorableDroppedDatabases",
         "location": "Central India",
@@ -96,7 +99,7 @@ DESCRIBE_RESTORABLE_DROPPED_DATABASES = [
         "server_id": server1,
     },
     {
-        "id": server2 + "/restorableDroppedDatabases/RDD2,002",
+        "id": f"{server2}/restorableDroppedDatabases/RDD2,002",
         "name": "RDD2,002",
         "type": "Microsoft.Sql/servers/restorableDroppedDatabases",
         "location": "Central India",
@@ -111,9 +114,10 @@ DESCRIBE_RESTORABLE_DROPPED_DATABASES = [
 ]
 
 
+
 DESCRIBE_FAILOVER_GROUPS = [
     {
-        "id": server1 + "/failoverGroups/FG1",
+        "id": f"{server1}/failoverGroups/FG1",
         "name": "FG1",
         "type": "Microsoft.Sql/servers/failoverGroups",
         "location": "Central India",
@@ -129,7 +133,7 @@ DESCRIBE_FAILOVER_GROUPS = [
         "server_id": server1,
     },
     {
-        "id": server2 + "/failoverGroups/FG1",
+        "id": f"{server2}/failoverGroups/FG1",
         "name": "FG1",
         "type": "Microsoft.Sql/servers/failoverGroups",
         "location": "Central India",
@@ -147,9 +151,10 @@ DESCRIBE_FAILOVER_GROUPS = [
 ]
 
 
+
 DESCRIBE_ELASTIC_POOLS = [
     {
-        "id": server1 + "/elasticPools/EP1",
+        "id": f"{server1}/elasticPools/EP1",
         "name": "EP1",
         "type": "Microsoft.Sql/servers/elasticPools",
         "location": "Central India",
@@ -161,7 +166,7 @@ DESCRIBE_ELASTIC_POOLS = [
         "server_id": server1,
     },
     {
-        "id": server2 + "/elasticPools/EP2",
+        "id": f"{server2}/elasticPools/EP2",
         "name": "EP2",
         "type": "Microsoft.Sql/servers/elasticPools",
         "location": "Central India",
@@ -173,6 +178,7 @@ DESCRIBE_ELASTIC_POOLS = [
         "server_id": server2,
     },
 ]
+
 
 
 DESCRIBE_DATABASES = [
@@ -187,7 +193,7 @@ DESCRIBE_DATABASES = [
         "license_type": "LicenseIncluded",
         "zone_redundant": False,
         "location": "Central India",
-        "id": server1 + "/databases/testdb1",
+        "id": f"{server1}/databases/testdb1",
         "name": "testdb1",
         "type": "Microsoft.Sql/servers/databases",
         "server_id": server1,
@@ -203,7 +209,7 @@ DESCRIBE_DATABASES = [
         "license_type": "LicenseIncluded",
         "zone_redundant": False,
         "location": "North Europe",
-        "id": server2 + "/databases/testdb2",
+        "id": f"{server2}/databases/testdb2",
         "name": "testdb2",
         "type": "Microsoft.Sql/servers/databases",
         "server_id": server2,
@@ -211,9 +217,10 @@ DESCRIBE_DATABASES = [
 ]
 
 
+
 DESCRIBE_REPLICATION_LINKS = [
     {
-        "id": server1 + "/databases/testdb1/replicationLinks/RL1",
+        "id": f"{server1}/databases/testdb1/replicationLinks/RL1",
         "name": "RL1",
         "type": "Microsoft.Sql/servers/databases/replicationLinks",
         "location": "North Europe",
@@ -227,10 +234,10 @@ DESCRIBE_REPLICATION_LINKS = [
         "percent_complete": 100,
         "replication_state": "CATCH_UP",
         "is_termination_allowed": True,
-        "database_id": server1 + "/databases/testdb1",
+        "database_id": f"{server1}/databases/testdb1",
     },
     {
-        "id": server2 + "/databases/testdb2/replicationLinks/RL2",
+        "id": f"{server2}/databases/testdb2/replicationLinks/RL2",
         "name": "RL2",
         "type": "Microsoft.Sql/servers/databases/replicationLinks",
         "location": "North Europe",
@@ -244,14 +251,15 @@ DESCRIBE_REPLICATION_LINKS = [
         "percent_complete": 100,
         "replication_state": "CATCH_UP",
         "is_termination_allowed": True,
-        "database_id": server2 + "/databases/testdb2",
+        "database_id": f"{server2}/databases/testdb2",
     },
 ]
 
 
+
 DESCRIBE_THREAT_DETECTION_POLICY = [
     {
-        "id": server1 + "/databases/testdb1/securityAlertPolicies/TDP1",
+        "id": f"{server1}/databases/testdb1/securityAlertPolicies/TDP1",
         "name": "TDP1",
         "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
         "location": "Central India",
@@ -264,10 +272,10 @@ DESCRIBE_THREAT_DETECTION_POLICY = [
         "storageAccountAccessKey": "",
         "storage_endpoint": "",
         "use_server_default": "Enabled",
-        "database_id": server1 + "/databases/testdb1",
+        "database_id": f"{server1}/databases/testdb1",
     },
     {
-        "id": server2 + "/databases/testdb2/securityAlertPolicies/TDP2",
+        "id": f"{server2}/databases/testdb2/securityAlertPolicies/TDP2",
         "name": "TDP2",
         "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
         "location": "Central India",
@@ -280,48 +288,50 @@ DESCRIBE_THREAT_DETECTION_POLICY = [
         "storageAccountAccessKey": "",
         "storage_endpoint": "",
         "use_server_default": "Enabled",
-        "database_id": server2 + "/databases/testdb2",
+        "database_id": f"{server2}/databases/testdb2",
     },
 ]
 
 
+
 DESCRIBE_RESTORE_POINTS = [
     {
-        "id": server1 + "/databases/testdb1/restorepoints/RP1",
+        "id": f"{server1}/databases/testdb1/restorepoints/RP1",
         "name": "RP1",
         "location": "Central India",
         "type": "Microsoft.Sql/servers/databases/restorePoints",
         "restore_point_type": "DISCRETE",
         "restore_point_creation_date": "2017-07-18T03:09:27Z",
-        "database_id": server1 + "/databases/testdb1",
+        "database_id": f"{server1}/databases/testdb1",
     },
     {
-        "id": server2 + "/databases/testdb2/restorepoints/RP2",
+        "id": f"{server2}/databases/testdb2/restorepoints/RP2",
         "name": "RP2",
         "location": "Central India",
         "type": "Microsoft.Sql/servers/databases/restorePoints",
         "restore_point_type": "DISCRETE",
         "restore_point_creation_date": "2017-07-18T03:09:27Z",
-        "database_id": server2 + "/databases/testdb2",
+        "database_id": f"{server2}/databases/testdb2",
     },
 ]
+
 
 
 DESCRIBE_TRANSPARENT_DATA_ENCRYPTIONS = [
     {
         "name": "TAE1",
         "location": "Central India",
-        "id": server1 + "/databases/testdb1/transparentDataEncryption/TAE1",
+        "id": f"{server1}/databases/testdb1/transparentDataEncryption/TAE1",
         "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
         "status": "Enabled",
-        "database_id": server1 + "/databases/testdb1",
+        "database_id": f"{server1}/databases/testdb1",
     },
     {
         "name": "TAE2",
         "location": "Central India",
-        "id": server2 + "/databases/testdb2/transparentDataEncryption/TAE2",
+        "id": f"{server2}/databases/testdb2/transparentDataEncryption/TAE2",
         "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
         "status": "Enabled",
-        "database_id": server2 + "/databases/testdb2",
+        "database_id": f"{server2}/databases/testdb2",
     },
 ]

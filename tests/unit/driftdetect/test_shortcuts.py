@@ -15,7 +15,7 @@ def test_basic_add_shortcuts():
     directory = "tests/data/test_cli_detectors/detector"
     alias = "test_shortcut"
     filename = "1.json"
-    shortcut_path = directory + '/shortcut.json'
+    shortcut_path = f'{directory}/shortcut.json'
     cli.main([
         "add-shortcut",
         "--query-directory",
@@ -42,7 +42,7 @@ def test_use_shortcuts_for_shortcuts():
     alias = "test_shortcut"
     alias_2 = "test_shortcut_2"
     filename = "1.json"
-    shortcut_path = directory + '/shortcut.json'
+    shortcut_path = f'{directory}/shortcut.json'
     cli.main([
         "add-shortcut",
         "--query-directory",
@@ -90,7 +90,7 @@ def test_shortcut_fails_when_shortcut_exists():
         "--file",
         filename,
     ])
-    shortcut_path = directory + '/shortcut.json'
+    shortcut_path = f'{directory}/shortcut.json'
     shortcut_data = FileSystem.load(shortcut_path)
     shortcut = ShortcutSchema().load(shortcut_data)
     with pytest.raises(KeyError):

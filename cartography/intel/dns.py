@@ -43,27 +43,24 @@ def ingest_dns_record_by_fqdn(
     fqdn_data = get_dns_resolution_by_fqdn(fqdn)
     record_type = get_dns_record_type(fqdn_data)
 
-    if record_type == 'A':
-        ip_list = []
-        for result in fqdn_data:
-            ip = str(result)
-            ip_list.append(ip)
-
-        value = ",".join(ip_list)
-        record_id = ingest_dns_record(
-            neo4j_session, fqdn, value, record_type, update_tag, points_to_record,
-            record_label, dns_node_additional_label,
-        )
-        _link_ip_to_A_record(neo4j_session, update_tag, ip_list, record_id)
-
-        return record_id
-    else:
+    if record_type != 'A':
         raise NotImplementedError(
-            "Ingestion of DNS record type '{}' by FQDN has not been implemented. Failed to ingest '{}'.".format(
-                record_type,
-                fqdn,
-            ),
+            f"Ingestion of DNS record type '{record_type}' by FQDN has not been implemented. Failed to ingest '{fqdn}'."
         )
+
+    ip_list = []
+    for result in fqdn_data:
+        ip = str(result)
+        ip_list.append(ip)
+
+    value = ",".join(ip_list)
+    record_id = ingest_dns_record(
+        neo4j_session, fqdn, value, record_type, update_tag, points_to_record,
+        record_label, dns_node_additional_label,
+    )
+    _link_ip_to_A_record(neo4j_session, update_tag, ip_list, record_id)
+
+    return record_id
 
 
 @timeit

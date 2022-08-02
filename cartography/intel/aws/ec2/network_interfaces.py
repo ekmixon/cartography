@@ -233,20 +233,24 @@ def load(neo4j_session: neo4j.Session, data: List[Dict], region: str, aws_accoun
     instance_associations = []
 
     for network_interface in data:
-        # https://aws.amazon.com/premiumsupport/knowledge-center/elb-find-load-balancer-IP/
-        matchObj = re.match(r'^ELB (?:net|app)/([^\/]+)\/(.*)', network_interface.get('Description', ''))
-        if matchObj:
-            elb_associations_v2.append({
-                'netinf_id': network_interface['NetworkInterfaceId'],
-                'elb_id': '{}-{}.elb.{}.amazonaws.com'.format(matchObj[1], matchObj[2], region),
-            })
-        else:
-            matchObj = re.match(r'^ELB (.*)', network_interface.get('Description', ''))
-            if matchObj:
-                elb_associations.append({
+        if matchObj := re.match(
+            r'^ELB (?:net|app)/([^\/]+)\/(.*)',
+            network_interface.get('Description', ''),
+        ):
+            elb_associations_v2.append(
+                {
                     'netinf_id': network_interface['NetworkInterfaceId'],
-                    'elb_name': matchObj[1],
-                })
+                    'elb_id': f'{matchObj[1]}-{matchObj[2]}.elb.{region}.amazonaws.com',
+                }
+            )
+
+        elif matchObj := re.match(
+            r'^ELB (.*)', network_interface.get('Description', '')
+        ):
+            elb_associations.append({
+                'netinf_id': network_interface['NetworkInterfaceId'],
+                'elb_name': matchObj[1],
+            })
 
         if 'Attachment' in network_interface and 'InstanceId' in network_interface['Attachment']:
             instance_associations.append({

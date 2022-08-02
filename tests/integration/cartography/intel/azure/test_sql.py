@@ -94,9 +94,10 @@ def test_load_server_dns_aliases(neo4j_session):
     )
 
     expected_nodes = {
-        server1 + "/dnsAliases/dns-alias-1",
-        server2 + "/dnsAliases/dns-alias-2",
+        f"{server1}/dnsAliases/dns-alias-1",
+        f"{server2}/dnsAliases/dns-alias-2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -125,13 +126,10 @@ def test_load_server_dns_aliases_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            server1, server1 + "/dnsAliases/dns-alias-1",
-        ),
-        (
-            server2, server2 + "/dnsAliases/dns-alias-2",
-        ),
+        (server1, f"{server1}/dnsAliases/dns-alias-1"),
+        (server2, f"{server2}/dnsAliases/dns-alias-2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -155,9 +153,10 @@ def test_load_server_ad_admins(neo4j_session):
     )
 
     expected_nodes = {
-        server1 + "/providers/Microsoft.Sql/administrators/ActiveDirectory1",
-        server2 + "/providers/Microsoft.Sql/administrators/ActiveDirectory2",
+        f"{server1}/providers/Microsoft.Sql/administrators/ActiveDirectory1",
+        f"{server2}/providers/Microsoft.Sql/administrators/ActiveDirectory2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -187,12 +186,15 @@ def test_load_server_ad_admins_relationships(neo4j_session):
 
     expected = {
         (
-            server1, server1 + "/providers/Microsoft.Sql/administrators/ActiveDirectory1",
+            server1,
+            f"{server1}/providers/Microsoft.Sql/administrators/ActiveDirectory1",
         ),
         (
-            server2, server2 + "/providers/Microsoft.Sql/administrators/ActiveDirectory2",
+            server2,
+            f"{server2}/providers/Microsoft.Sql/administrators/ActiveDirectory2",
         ),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -216,8 +218,10 @@ def test_load_recoverable_databases(neo4j_session):
     )
 
     expected_nodes = {
-        server1 + "/recoverabledatabases/RD1", server2 + "/recoverabledatabases/RD2",
+        f"{server1}/recoverabledatabases/RD1",
+        f"{server2}/recoverabledatabases/RD2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -246,13 +250,10 @@ def test_load_recoverable_databases_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            server1, server1 + "/recoverabledatabases/RD1",
-        ),
-        (
-            server2, server2 + "/recoverabledatabases/RD2",
-        ),
+        (server1, f"{server1}/recoverabledatabases/RD1"),
+        (server2, f"{server2}/recoverabledatabases/RD2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -276,9 +277,10 @@ def test_load_restorable_dropped_databases(neo4j_session):
     )
 
     expected_nodes = {
-        server1 + "/restorableDroppedDatabases/RDD1,001",
-        server2 + "/restorableDroppedDatabases/RDD2,002",
+        f"{server1}/restorableDroppedDatabases/RDD1,001",
+        f"{server2}/restorableDroppedDatabases/RDD2,002",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -307,13 +309,10 @@ def test_load_restorable_dropped_databases_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            server1, server1 + "/restorableDroppedDatabases/RDD1,001",
-        ),
-        (
-            server2, server2 + "/restorableDroppedDatabases/RDD2,002",
-        ),
+        (server1, f"{server1}/restorableDroppedDatabases/RDD1,001"),
+        (server2, f"{server2}/restorableDroppedDatabases/RDD2,002"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -337,9 +336,10 @@ def test_load_failover_groups(neo4j_session):
     )
 
     expected_nodes = {
-        server1 + "/failoverGroups/FG1",
-        server2 + "/failoverGroups/FG1",
+        f"{server1}/failoverGroups/FG1",
+        f"{server2}/failoverGroups/FG1",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -368,13 +368,10 @@ def test_load_failover_groups_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            server1, server1 + "/failoverGroups/FG1",
-        ),
-        (
-            server2, server2 + "/failoverGroups/FG1",
-        ),
+        (server1, f"{server1}/failoverGroups/FG1"),
+        (server2, f"{server2}/failoverGroups/FG1"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -397,10 +394,7 @@ def test_load_elastic_pools(neo4j_session):
         TEST_UPDATE_TAG,
     )
 
-    expected_nodes = {
-        server1 + "/elasticPools/EP1",
-        server2 + "/elasticPools/EP2",
-    }
+    expected_nodes = {f"{server1}/elasticPools/EP1", f"{server2}/elasticPools/EP2"}
 
     nodes = neo4j_session.run(
         """
@@ -429,13 +423,10 @@ def test_load_elastic_pools_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            server1, server1 + "/elasticPools/EP1",
-        ),
-        (
-            server2, server2 + "/elasticPools/EP2",
-        ),
+        (server1, f"{server1}/elasticPools/EP1"),
+        (server2, f"{server2}/elasticPools/EP2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -459,8 +450,10 @@ def test_load_databases(neo4j_session):
     )
 
     expected_nodes = {
-        server1 + "/databases/testdb1", server2 + "/databases/testdb2",
+        f"{server1}/databases/testdb1",
+        f"{server2}/databases/testdb2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -489,13 +482,10 @@ def test_load_databases_relationships(neo4j_session):
     )
 
     expected = {
-        (
-            server1, server1 + "/databases/testdb1",
-        ),
-        (
-            server2, server2 + "/databases/testdb2",
-        ),
+        (server1, f"{server1}/databases/testdb1"),
+        (server2, f"{server2}/databases/testdb2"),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -519,9 +509,10 @@ def test_load_replication_links(neo4j_session):
     )
 
     expected_nodes = {
-        server1 + "/databases/testdb1/replicationLinks/RL1",
-        server2 + "/databases/testdb2/replicationLinks/RL2",
+        f"{server1}/databases/testdb1/replicationLinks/RL1",
+        f"{server2}/databases/testdb2/replicationLinks/RL2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -550,12 +541,15 @@ def test_load_replication_links_relationships(neo4j_session):
 
     expected = {
         (
-            server1 + "/databases/testdb1", server1 + "/databases/testdb1/replicationLinks/RL1",
+            f"{server1}/databases/testdb1",
+            f"{server1}/databases/testdb1/replicationLinks/RL1",
         ),
         (
-            server2 + "/databases/testdb2", server2 + "/databases/testdb2/replicationLinks/RL2",
+            f"{server2}/databases/testdb2",
+            f"{server2}/databases/testdb2/replicationLinks/RL2",
         ),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -579,9 +573,10 @@ def test_load_db_threat_detection_policies(neo4j_session):
     )
 
     expected_nodes = {
-        server1 + "/databases/testdb1/securityAlertPolicies/TDP1",
-        server2 + "/databases/testdb2/securityAlertPolicies/TDP2",
+        f"{server1}/databases/testdb1/securityAlertPolicies/TDP1",
+        f"{server2}/databases/testdb2/securityAlertPolicies/TDP2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -610,12 +605,15 @@ def test_load_db_threat_detection_policies_relationships(neo4j_session):
 
     expected = {
         (
-            server1 + "/databases/testdb1", server1 + "/databases/testdb1/securityAlertPolicies/TDP1",
+            f"{server1}/databases/testdb1",
+            f"{server1}/databases/testdb1/securityAlertPolicies/TDP1",
         ),
         (
-            server2 + "/databases/testdb2", server2 + "/databases/testdb2/securityAlertPolicies/TDP2",
+            f"{server2}/databases/testdb2",
+            f"{server2}/databases/testdb2/securityAlertPolicies/TDP2",
         ),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -639,9 +637,10 @@ def test_load_restore_points(neo4j_session):
     )
 
     expected_nodes = {
-        server1 + "/databases/testdb1/restorepoints/RP1",
-        server2 + "/databases/testdb2/restorepoints/RP2",
+        f"{server1}/databases/testdb1/restorepoints/RP1",
+        f"{server2}/databases/testdb2/restorepoints/RP2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -670,12 +669,15 @@ def test_load_restore_points_relationships(neo4j_session):
 
     expected = {
         (
-            server1 + "/databases/testdb1", server1 + "/databases/testdb1/restorepoints/RP1",
+            f"{server1}/databases/testdb1",
+            f"{server1}/databases/testdb1/restorepoints/RP1",
         ),
         (
-            server2 + "/databases/testdb2", server2 + "/databases/testdb2/restorepoints/RP2",
+            f"{server2}/databases/testdb2",
+            f"{server2}/databases/testdb2/restorepoints/RP2",
         ),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(
@@ -699,9 +701,10 @@ def test_load_transparent_data_encryptions(neo4j_session):
     )
 
     expected_nodes = {
-        server1 + "/databases/testdb1/transparentDataEncryption/TAE1",
-        server2 + "/databases/testdb2/transparentDataEncryption/TAE2",
+        f"{server1}/databases/testdb1/transparentDataEncryption/TAE1",
+        f"{server2}/databases/testdb2/transparentDataEncryption/TAE2",
     }
+
 
     nodes = neo4j_session.run(
         """
@@ -730,12 +733,15 @@ def test_load_transparent_data_encryptions_relationships(neo4j_session):
 
     expected = {
         (
-            server1 + "/databases/testdb1", server1 + "/databases/testdb1/transparentDataEncryption/TAE1",
+            f"{server1}/databases/testdb1",
+            f"{server1}/databases/testdb1/transparentDataEncryption/TAE1",
         ),
         (
-            server2 + "/databases/testdb2", server2 + "/databases/testdb2/transparentDataEncryption/TAE2",
+            f"{server2}/databases/testdb2",
+            f"{server2}/databases/testdb2/transparentDataEncryption/TAE2",
         ),
     }
+
 
     # Fetch relationships
     result = neo4j_session.run(

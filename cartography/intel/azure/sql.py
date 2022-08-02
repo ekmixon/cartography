@@ -26,8 +26,7 @@ def get_client(credentials: Credentials, subscription_id: str) -> SqlManagementC
     """
     Getting the Azure SQL client
     """
-    client = SqlManagementClient(credentials, subscription_id)
-    return client
+    return SqlManagementClient(credentials, subscription_id)
 
 
 @timeit

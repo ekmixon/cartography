@@ -100,8 +100,9 @@ def sync(
         cluster_data: List[Dict] = []
         for cluster in clusters:
             cluster_id = cluster['Id']
-            cluster_details = get_emr_describe_cluster(boto3_session, region, cluster_id)
-            if cluster_details:
+            if cluster_details := get_emr_describe_cluster(
+                boto3_session, region, cluster_id
+            ):
                 cluster_data.append(cluster_details)
             time.sleep(DESCRIBE_SLEEP)
 

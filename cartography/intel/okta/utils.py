@@ -10,7 +10,7 @@ def is_last_page(response: PagedResults) -> bool:
     :return: boolean indicating if we are at the last page or not
     """
     # from https://github.com/okta/okta-sdk-python/blob/master/okta/framework/PagedResults.py
-    return not ("next" in response.links)
+    return "next" not in response.links
 
 
 def create_api_client(okta_org: str, path_name: str, api_key: str) -> ApiClient:
@@ -21,10 +21,8 @@ def create_api_client(okta_org: str, path_name: str, api_key: str) -> ApiClient:
     :param api_key: Okta api key
     :return: Instance of ApiClient
     """
-    api_client = ApiClient(
+    return ApiClient(
         base_url=f"https://{okta_org}.okta.com/",
         pathname=path_name,
         api_token=api_key,
     )
-
-    return api_client

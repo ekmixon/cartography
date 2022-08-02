@@ -29,8 +29,7 @@ def get_gcp_buckets(storage: Resource, project_id: str) -> Dict:
     """
     try:
         req = storage.buckets().list(project=project_id)
-        res = req.execute()
-        return res
+        return req.execute()
     except HttpError as e:
         reason = compute._get_error_reason(e)
         if reason == 'invalid':
@@ -68,12 +67,11 @@ def transform_gcp_buckets(bucket_res: Dict) -> List[Dict]:
 
     bucket_list = []
     for b in bucket_res.get('items', []):
-        bucket = {}
-        bucket['etag'] = b.get('etag')
+        bucket = {'etag': b.get('etag')}
         bucket['iam_config_bucket_policy_only'] = \
             b.get('iamConfiguration', {}).get('bucketPolicyOnly', {}).get('enabled', None)
         bucket['id'] = b['id']
-        bucket['labels'] = [(key, val) for (key, val) in b.get('labels', {}).items()]
+        bucket['labels'] = list(b.get('labels', {}).items())
         bucket['owner_entity'] = b.get('owner', {}).get('entity')
         bucket['owner_entity_id'] = b.get('owner', {}).get('entityId')
         bucket['kind'] = b.get('kind')

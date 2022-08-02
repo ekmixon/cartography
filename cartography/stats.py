@@ -25,13 +25,8 @@ class ScopedStatsClient:
         This method returns a new proxy to the same client
         which will prefix all calls to underlying methods with the scoped prefix
         """
-        if not self._scope_prefix:
-            prefix = scope
-        else:
-            prefix = f"{self._scope_prefix}.{scope}"
-
-        scoped_stats_client = ScopedStatsClient(prefix, self._root)
-        return scoped_stats_client
+        prefix = f"{self._scope_prefix}.{scope}" if self._scope_prefix else scope
+        return ScopedStatsClient(prefix, self._root)
 
     @staticmethod
     def get_root_client() -> 'ScopedStatsClient':
